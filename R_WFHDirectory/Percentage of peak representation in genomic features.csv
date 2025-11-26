@@ -1,0 +1,37 @@
+"Sample","Feature","Percentage"
+"Encode ChIP","1st Exon",2.84298650264821
+"Encode ChIP","1st Intron",23.1641893046301
+"Encode ChIP","3' UTR",2.62087818212882
+"Encode ChIP","5' UTR",0.328036904151717
+"Encode ChIP","Distal Intergenic",19.3746796514608
+"Encode ChIP","Downstream (<=300bp)",0.123013839056894
+"Encode ChIP","Other Exon",4.11412950623612
+"Encode ChIP","Other Intron",27.5072612335554
+"Encode ChIP","Promoter",19.9248248761319
+"GEO ChIP","1st Exon",2.65541571319603
+"GEO ChIP","1st Intron",24.5518688024409
+"GEO ChIP","3' UTR",2.32646834477498
+"GEO ChIP","5' UTR",0.3813882532418
+"GEO ChIP","Distal Intergenic",19.9990465293669
+"GEO ChIP","Downstream (<=300bp)",0.104881769641495
+"GEO ChIP","Other Exon",4.71491228070175
+"GEO ChIP","Other Intron",29.762585812357
+"GEO ChIP","Promoter",15.5034324942792
+"High Stringency Calling Cards","1st Exon",5.32544378698225
+"High Stringency Calling Cards","1st Intron",23.4714003944773
+"High Stringency Calling Cards","3' UTR",2.16962524654832
+"High Stringency Calling Cards","5' UTR",0.591715976331361
+"High Stringency Calling Cards","Distal Intergenic",23.0769230769231
+"High Stringency Calling Cards","Downstream (<=300bp)",0
+"High Stringency Calling Cards","Other Exon",7.49506903353057
+"High Stringency Calling Cards","Other Intron",29.1913214990138
+"High Stringency Calling Cards","Promoter",8.67850098619329
+"Low Stringency Calling Cards","1st Exon",4.38034188034188
+"Low Stringency Calling Cards","1st Intron",24.465811965812
+"Low Stringency Calling Cards","3' UTR",2.24358974358974
+"Low Stringency Calling Cards","5' UTR",0.427350427350427
+"Low Stringency Calling Cards","Distal Intergenic",22.4358974358974
+"Low Stringency Calling Cards","Downstream (<=300bp)",0
+"Low Stringency Calling Cards","Other Exon",7.90598290598291
+"Low Stringency Calling Cards","Other Intron",28.2051282051282
+"Low Stringency Calling Cards","Promoter",9.93589743589744

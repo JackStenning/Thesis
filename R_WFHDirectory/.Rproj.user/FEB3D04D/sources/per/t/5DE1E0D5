@@ -1,0 +1,28 @@
+{
+    "id": "5DE1E0D5",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1734532134435.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "id": "e567a2e0ab3a4a7b8d9bcd04d94ead25",
+        "name": "ego3",
+        "title": "ego3",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1982935983361,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1734532134435,
+    "read_only": false,
+    "read_only_alternatives": []
+}

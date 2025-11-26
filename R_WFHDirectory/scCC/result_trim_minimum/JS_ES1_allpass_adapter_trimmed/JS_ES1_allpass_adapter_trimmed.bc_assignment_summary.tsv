@@ -1,0 +1,9 @@
+bc_corrected	3.00
+bc_no_shortlist_match	57.00
+bc_shortlist_exact_match	139.00
+cell_count_read_threshold	1.00
+fraction_of_high_q_reads_in_cells	1.00
+high_q_reads_in_cells	167.00
+high_quality_barcodes	120.00
+high_quality_reads	167.00
+n_cells_after_filtering	120.00

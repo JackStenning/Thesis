@@ -1,0 +1,28 @@
+{
+    "id": "CBED10B1",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1734532363157.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "id": "539bdfcff25946d7812387b899858f24",
+        "name": "ego2",
+        "title": "ego2",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1982935983361,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1734532363157,
+    "read_only": false,
+    "read_only_alternatives": []
+}

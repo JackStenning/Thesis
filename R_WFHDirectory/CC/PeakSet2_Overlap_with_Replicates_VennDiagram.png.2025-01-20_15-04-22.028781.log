@@ -1,0 +1,13 @@
+INFO [2025-01-20 15:04:22] $x
+INFO [2025-01-20 15:04:22] list(ESR1_pyCC_2_ER1_overlaping, ESR1_pyCC_2_ER2_overlaping, 
+INFO [2025-01-20 15:04:22]     ESR1_pyCC_2_ER3_overlaping, ESR1_pyCC_2_ER5_overlaping, ESR1_pyCC_2_ER6_overlaping)
+INFO [2025-01-20 15:04:22] 
+INFO [2025-01-20 15:04:22] $category.names
+INFO [2025-01-20 15:04:22] c("Peak_2_ER1", "Peak_2_ER2", "Peak_2_ER3", "Peak_2_ER5", "Peak_2_ER6")
+INFO [2025-01-20 15:04:22] 
+INFO [2025-01-20 15:04:22] $filename
+INFO [2025-01-20 15:04:22] [1] "PeakSet2_Overlap_with_Replicates_VennDiagram.png"
+INFO [2025-01-20 15:04:22] 
+INFO [2025-01-20 15:04:22] $output
+INFO [2025-01-20 15:04:22] [1] TRUE
+INFO [2025-01-20 15:04:22] 

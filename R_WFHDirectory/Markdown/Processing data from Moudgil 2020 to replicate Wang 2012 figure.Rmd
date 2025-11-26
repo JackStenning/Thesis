@@ -1,0 +1,628 @@
+---
+title: "Processing data from Moudgil et al., 2020 to replicate Wang et al., 2012 figure 3A."
+author: "Jack Stenning"
+date: "2023-11-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Background
+## Rationale
+Before receiving the data from our first bulk ER calling cards pilot, I was unsure of how to process the data set I would recieve in order to analyse the data in a meaningful way. Therefore, we decided that practicing by replicating figures on the existing calling card data sets would be the best way to train these skills. 
+
+However, the Moudgil et al.,  2020 paper focuses mainly on single-cell applications of calling cards, so I looked at the older publications of the method to find how bulk calling cards were presented. I found that Wang et al., 2012 and 2011 showed some plots that I thought I could re-create in order to understand how they are processed. Specifically, I aimed to re-create figure 3A from Wang et al., 2012 by plotting the percentage of calling card peaks within 250 bp and 1000 bp of ChIP-Seq peaks. I chose this plot first because it would enable me to check that the data was aligned correctly, and I could then go on to create other plots from the paper. However, I ran into some challenges when processing the data from these papers as I found the sequence of the barcodes used to be unclear.
+
+I therefore reasoned that given similar bulk calling card experiments were carried out with SP1-PBase,  SP1-HyPBase and their undirected counterparts in Moudgil et al.,  2020, I could potentially re-create these plots with the more recent data sets. I was able to process the data in the same way described in Moudgil et al.,  2020. However, the plots I made showed a significantly lower amount of SP1 overlap with the ChIP-seq data set than both of your publications. 
+
+Assuming I had made a mistake, I started again and checked I had done everything correctly. In doing so, I noticed that the control for the SP1 ChIP-Seq named in the paper (ENCFF000PBO) was different to the control listed in the ENCODE database (ENCFF000PBY). I carried out the re-analysis of the data with both controls and found some interesting results. To ensure I was carrying out everything correctly, I changed my looped scripts to hard code.
+
+I wanted to compile my work into this document so I can show you my analysis and hopefully you will be able to help me realise what I am doing wrong and how I can properly process these data sets. 
+
+I am really grateful that you are taking the time to help me with this, thank you!
+
+# Method
+## Working on the Univeristy of York Viking HPCC
+### ChIP-Seq pre-processing
+After finding the different control experiments, I thought I would start by processing the external datasets first. These datasets were:
+
+```{bash get external data, eval=FALSE}
+#SP1 ChIP-Seq
+curl  -L -o ENCFF000PCT.fastq.gz https://www.encodeproject.org/files/ENCFF000PCT/@@download/ENCFF000PCT.fastq.gz
+
+#SP1 ChIP-Seq ENCODE input
+curl -L -o ENCFF000PBY.fastq.gz https://www.encodeproject.org/files/ENCFF000PBY/@@download/ENCFF000PBY.fastq.gz
+
+#SP1 ChIP-Seq Mitra input
+curl -L -o ENCFF000PBO.fastq.gz https://www.encodeproject.org/files/ENCFF000PBO/@@download/ENCFF000PBO.fastq.gz
+```
+
+Next the .fastq was aligned to hg38 using bwa mem - this is because I didnt have access to Novoalign on the Viking HPCC - and were converted into. 
+
+Below is an example of the script used for one of these files, the same code was run for each of the above files with the exception of substituting the name of the file to be processed.
+
+```{bash algin, eval=FALSE}
+#Load modules
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+
+#Unzip and align
+gunzip *.gz
+bwa mem -p ENCFF000PCT -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PCT.fastq > \
+  ENCFF000PCT_aligned.sam
+  
+#Convert to bam and sort
+samtools view -S -b ENCFF000PCT_aligned.sam > ENCFF000PCT.bam
+samtools sort ENCFF000PCT.bam -o ENCFF000PCT_sorted_hg38.bam
+samtools index ENCFF000PCT_sorted_hg38.bam
+```
+
+Once the .bam files were generated they could be converted into bed files in order to filter out blacklisted sites. For this analysis, the blacklist used was generated from the following publication:
+
+Amemiya, H.M., Kundaje, A. & Boyle, A.P. The ENCODE Blacklist: Identification of Problematic Regions of the Genome. Sci Rep 9, 9354 (2019). https://doi.org/10.1038/s41598-019-45839-z
+
+Below is an example of the script used for one of these files, the same code was run for each of the above files with the exception of substituting the name of the file to be processed.
+
+```{bash filter, eval=FALSE}
+#Load modules
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#Convert to bed
+bedtools bamtobed -i ENCFF000PCT_sorted_hg38.bam > ENCFF000PCT_hg38.bed
+bedtools sort -i ENCFF000PCT_hg38.bed > ENCFF000PCT_sorted_hg38.bed
+
+#Filter blacklist
+bedops -n -1 ENCFF000PCT_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38\
+  /Blacklist/hg38-blacklist.v2.bed > ENCFF000PCT_filtered_sorted_hg38.bed
+```
+
+The filtered and sorted .bed files were then used as inputs for peak calling with MACS2. This was done using both ENCFF000PBO and ENCFF000PBY.
+
+
+```{bash MACS2, eval=FALSE}
+#Load modules
+module load bio/MACS2/2.2.7.1-foss-2019b-Python-3.7.4
+
+#Process SP1 FASTQ with Mitra control
+macs2 callpeak -t ENCFF000PCT_filtered_sorted_hg38.bed \
+	-c input/Mitra/ENCFF000PBO_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	--keep-dup auto \
+	-q 0.05 \
+	-n SP1_ChIP_Mitra_input \
+	--outdir MACS2/Mitra_input
+	
+#Process SP1 FASTQ with ENCODE control
+macs2 callpeak -t ENCFF000PCT_filtered_sorted_hg38.bed \
+	-c input/ENCODE/ENCFF000PBY_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	--keep-dup auto \
+	-q 0.05 \
+	-n SP1_ChIP_ENCODE_controlinput \
+	--outdir MACS2/ENCODE_input
+```
+
+After this, the bulk calling card data was processed
+
+### Calling Card pre-processing
+
+After downloading the data with the following code, files were separated into different directories based on whether they were SP1-directed or undirected and then were further split into HyPBase and PBase.
+```{bash get CC, eval=FALSE}
+curl -L -o GSE148448_RAW.tar ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148448/suppl/GSE148448_RAW.tar
+tar -xvf GSE148448_RAW.tar
+
+##Move data to the correct place
+#Undirected PBase
+mv *HCT-116_PBase* ../Undirected_Hy_PBase/PBase
+#Undirected HyPB
+mv *HCT-116_HyPBase* ../Undirected_Hy_PBase/HyPB
+#SP1-PBase
+mv *HCT-116_SP1-PBase* ../SP1-Hy_PBase/PBase
+#SP1-HyPB
+mv *HCT-116_SP1-HyPBase* ../SP1-Hy_PBase/HyPB
+```
+
+In order to avoid as many issues as possible during processing the data, I used the '.ccf' files supplied in the '.tar' file. Therefore, as the protocol.io suggests these have been pre-processed, I proceeded to creating blocks using the custom code on GitHub after filtering the same blacklisted sites. It should be noted that this step was not done during the initial analysis however, I have confirmed that this filtering step does not significantly reduce the number of peaks generated in later steps.
+
+Below is an example of the script used for one of these files, the same code was run for each of the above files with the exception of substituting the name of the file to be processed.
+
+```{bash filter and block, eval=FALSE}
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+
+#Load modules
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+
+#Unzip and sort
+gunzip *.gz
+bedtools sort -i GSM4471639_HCT-116_SP1-HyPBase.ccf.txt > GSM4471639_HCT-116_SP1-HyPBase_sorted.qbed
+
+#Filter
+bedops -n -1 GSM4471639_HCT-116_SP1-HyPBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38\
+  /Blacklist/hg38-blacklist.v2.bed > GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed
+
+#Set up Python environment
+pip3 install twobitreader
+pip3 install pysam
+pip3 install numpy
+pip3 install pandas
+pip3 install scipy
+pip3 install statsmodels
+pip3 install pybedtools
+pip3 install astropy
+source activate Callingcardspy
+
+#Create Blocks
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed | \
+  sed -e '/^\s*$/d' > GSM4471639_HCT-116_SP1-HyPBase_filtered.blocks
+echo "done SP1-HyPB"
+```
+
+Once this was done with each of the .ccf files I was able to call peaks using the custom code on GitHub, using the same parameters as Moudgil et al., 2020. 
+
+Below is an example of the script used for HyPBase peak calling, the same code was run for each of the PBase files with the exception of substituting the name of the file to be processed.
+
+```{bash Calling CC peaks, eval=FALSE}
+#Calling Undirected HyPB peaks
+python BBPeakCaller_BRD4.py -p 9 -d 12500 \
+	-i GSM4471638_HCT-116_HyPBase_filtered_p9_intermediate.csv \
+	GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed \
+	GSM4471638_HCT-116_HyPBase_filtered.blocks \
+	/mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+	GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed
+	
+python BBPeakCaller_TF.py -a 0.05 -m fdr_bh -d 250 -x 5000 \
+	-i GSM4471639_HCT-116_SP1-HyPBase_filtered_intermediate.csv \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered.blocks \
+	../../Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered.blocks \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed
+```
+
+### Using Bedtools to determine overlapping CC peaks with ChIP-Seq peaks
+Once the peak files were generated for the CC and ChIP-Seq datasets, I used bedtools window to determine the overlap between a given CC peak file and its corresponding ChIP-Seq dataset. 
+
+This was done four times for each of the CC peak files I generated in this analysis and for the peak files provided in GSE148448_RAW. 
+
+It should be noted that the peak files provided in GSE148448_RAW were pre-processed to remove information that was unnecessary for this analysis - the code used can be seen below.
+
+```{bash, eval=FALSE}
+#Get rid of columns
+awk '{print $1, $2, $3, $4}' /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC\
+  /SP1-Hy_PBase/PBase/Moudgil_peaks/GSM4471637_HCT-116_SP1-PBase_peaks.tsv > \
+  /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra\
+  /Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peakstocon.bed
+
+#get rid of header
+sed -i '1d' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra\
+  /Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peakstocon.bed
+
+#convert to BED
+sed -e 's/ /\t/g' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra\
+/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peakstocon.bed > \
+  /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra\
+  /Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peaks.bed 
+
+```
+
+The first two times running bedtools window for each CC peak file, the data was processed to find the overlap within 1000 bp between CC peaks and ChIP-Seq peaks that were either controlled with ENCFF000PBO OR ENCFF000PBY. Below is an example of how SP1-HyPB peaks were processed, the same code was repeated with each file with the exception of switching the names of the input files
+
+```{bash 1000 bp window, eval=FALSE}
+#Load modules
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#Mitra control
+bedtools window -c -a /CC/SP1-Hy_PBase/HyPB/GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed \
+  -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > \
+  WindowOutputs/SP1-HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a /CC/SP1-Hy_PBase/HyPB/GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed \
+  -b /ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > \
+  WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+
+```
+
+Then, the same code was run but the window size argument was added to change the window size from the 1000 bp default to 250 bp. Below is an example of how SP1-HyPB peaks were processed, the same code was repeated with each file with the exception of switching the names of the input files.
+
+```{bash 250 bp window, eval=FALSE}
+#Mitra control
+./bedtools window -c -w 250 -a GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed \
+  -b SP1_ChIP_Mitra_input_peaks.narrowPeak > \
+  20230925WindowOutputs/SP1_HyPB/Mitra/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+./bedtools window -c -w 250 -a GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed \
+  -b SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > \
+  1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+```
+
+Finally, to re-create figure 3A from Wang et al. 2012, I also ran bed tools window on the genomic TTAA file used to create the undirected (Hy)PBase blocks.
+
+```{bash TTAA, eval=FALSE}
+#Mitra control
+bedtools window -c -a /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+  -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak >\
+  WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+  -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > \
+  WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_ENCODE.bed
+
+```
+
+I then downloaded these onto my PC with WinSCP to process in RStudio
+
+## Processing data in RStudio
+After downloading, I converted the output files into R dataframes. Below is an example of the code used for the SP1-HyPB plots looking at overlap with SP1 ChIP-Seq peaks within 1000 bp, the code for the other plots is the same, with the input file names and paths changed.
+
+```{r Get data, echo=TRUE, warning=FALSE, message=FALSE}
+#Get and load software
+library(rgl)
+library(ggplot2)
+library(ggthemes)
+
+# In order to plot the percentage of reads within X base pairs of a CC peak, we needed to run an analysis
+#that increased the window size of reads by X bp, and then search for overlaps between two files
+
+#This has already been done on viking with 0.25 and 1 kbp, so we need to turn the outputs into dataframe
+
+#Set column names
+col_names = c("Chromosome", "Position Start", "Position End", "Number of Overlaps with ChIP-Seq Peaks")
+Genocol_names = c("Chromosome", "Position Start", "Position End", 'notused', 'notused', 'notused',  
+                                                                  "Number of Overlaps with ChIP-Seq Peaks")
+
+#Get data
+#SP1 directed
+SP1_HyPB_1kbp <- read.table("Data/20230912WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed", 
+header = TRUE, sep = "\t", col.names = col_names)
+
+#Undirected
+HyPB_1kbp <- read.table("Data/20230912WindowOutputs/HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed", 
+header = TRUE, sep = "\t", col.names = col_names)
+
+#Genomic TTAA
+GenoTTAA <- read.table("Data/20230925WindowOutputs/TTAA_win_SP1ChIP/ENCODE/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_ENCODE.bed", 
+header = TRUE, sep = "\t", col.names = Genocol_names)
+
+```
+
+Once loaded in, the total number of peaks in each file is loaded as an object. After, the number of CC peaks that show no overlap with ChIP-Seq peaks (denoted by having a '0' in the "Number of Overlaps with ChIP-Seq Peaks" column) are also loaded as an object.
+
+```{r load numeric values, echo=TRUE, warning=FALSE, message=FALSE}
+#Once in the dataframe, we can count how many reads are in each file by the number of lines in each dataframe
+SP1_HyPBTotalPeaks = nrow(SP1_HyPB_1kbp)
+HyPBTotalPeaks = nrow(HyPB_1kbp)
+TTAAtotal = nrow(GenoTTAA)
+#Then we count the number of reads with no overlap - this is denoted by a '0' in the overlap column
+
+SP1_HyPB_1kbp_a_peaks_b_overlap <- as.numeric(length(which(SP1_HyPB_1kbp$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+PBase_1kbp_a_peaks_b_overlap <- as.numeric(length(which(HyPB_1kbp$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+TTAA_1kbp_a_peaks_b_overlap <- as.numeric(length(which(GenoTTAA$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+```
+
+Finally, the percentage of peaks that do not overlap with ChIP-Seq can be determined, and therefore we can also derive the percentage of peaks that do overlap. This is loaded into a table before plotting with ggplot. 
+
+```{r calculate overlap and plot, echo=TRUE, warning=FALSE, message=FALSE}
+#Then we can work out percentage of overlapped reads from the number of non-overlapped reads
+Percent_HyPB_1kbp <- (1-(SP1_HyPB_1kbp_a_peaks_b_overlap/SP1_HyPBTotalPeaks))*100
+Percent_PBase_1kbp <- (1-(PBase_1kbp_a_peaks_b_overlap/HyPBTotalPeaks))*100
+Percent_TTAA_1kbp <- (1-(TTAA_1kbp_a_peaks_b_overlap/TTAAtotal))*100
+
+#and we can create a table to plot, Col1=Total reads,Col2= non-overlapped reads
+Final_Percentage_table <- data.frame(Name=c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp'),
+  Total=rep(c(SP1_HyPBTotalPeaks, HyPBTotalPeaks, TTAAtotal)),
+  Overlap_withChIP= c(SP1_HyPB_1kbp_a_peaks_b_overlap, PBase_1kbp_a_peaks_b_overlap, TTAA_1kbp_a_peaks_b_overlap),
+  PercentageOverlapping= c(Percent_HyPB_1kbp, Percent_PBase_1kbp, Percent_TTAA_1kbp))
+
+#Finally, we can now plot
+Figure <- ggplot(data = Final_Percentage_table, 
+                 aes(x= reorder(Name, -PercentageOverlapping), 
+                     y = PercentageOverlapping,
+                     fill = Name)) + 
+                 geom_col(color = "black",
+                          show.legend = FALSE) +  
+                 ylim(0, 100) + 
+                 labs(x = "Name and Distance from ChIP-Seq Peak",
+                      y = "% of CC peaks overlapping with ChIP-Seq peak",
+                      title = "Calling Cards and ChIP-Seq Overlap",
+                      subtitle = "Determining percentage of SP1-HyPB and HyPB peaks within 1000 bp \nof SP1 ChIP-Seq peaks using ENCODE control") +                            theme_dark() + 
+                 coord_cartesian(expand = FALSE, clip = "off") +
+                 geom_hline(yintercept = 83, 
+                            linetype = "dashed", 
+                            linewidth = 1) 
+
+
+Figure
+########################################################################
+
+```
+
+In order to replicate figure 3A from Wang et al., 2012, I have plotted a bargraph of the SP1-HyPB overlap, HyPB overlap and genomic TTAA overlap percentages with either the 'ENCODE control' (ENCFF000PBY) or the 'Mitra control' (ENCFF000PBO) in one figure.
+
+This was repeated for each of the (SP1-)HyPB, (SP1-)PBase CC peak files provided in GSE148448_RAW and files that were generated in this analysis. 
+
+# Results
+## My SP1-HyPB Calling Card peaks overlap with ENCODE controlled SP1 ChIP-Seq
+
+To maintain relevance to my project, only HyPB will be discussed in this markdown, but results for PBase can also be discussed for your interest.
+
+I started by plotting the overlap between calling card peak files I had generated with the ENCODE controlled SP1-ChIP because this is what I had tried to carry out in my first analysis attempt. The plot generated from this re-analysis can be seen below.
+
+
+
+
+### Figure 1
+```{r my SP1 + encode 1kbp, echo=FALSE, warning=FALSE, message=FALSE}
+#Load software
+library(rgl)
+library(ggplot2)
+library(ggthemes)
+##Process data
+
+# In order to plot the percentage of reads within X base pairs of a CC peak, we needed to run an analysis
+#that increased the window size of reads by X bp, and then search for overlaps between two files
+
+#This has already been done on viking with 0.25 and 1 kbp, so we need to turn the Outputs into dataframe
+col_names = c("Chromosome", "Position Start", "Position End", "Number of Overlaps with ChIP-Seq Peaks")
+Genocol_names = c("Chromosome", "Position Start", "Position End", 'notused', 'notused', 'notused',"Number of Overlaps with ChIP-Seq Peaks")
+SP1_HyPB_1kbp_narrow <- read.table("Data/20230912WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed", header = TRUE, sep = "\t", col.names = col_names)
+HyPB_1kbp_narrow <- read.table("Data/20230912WindowOutputs/HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed", header = TRUE, sep = "\t", col.names = col_names)
+GenoTTAA <- read.table("Data/20230925WindowOutputs/TTAA_win_SP1ChIP/ENCODE/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_ENCODE.bed", header = TRUE, sep = "\t", col.names = Genocol_names)
+
+#Once in the dataframe, we can count how many reads are in each file by the number of lines in each dataframe
+SP1_HyPBTotalPeaks = nrow(SP1_HyPB_1kbp_narrow)
+HyPBTotalPeaks = nrow(HyPB_1kbp_narrow)
+TTAAtotal = nrow(GenoTTAA)
+#Then we count the number of reads with no overlap - this is denoted by a '0' in the overlap column
+
+SP1_HyPB_1kbp_a_peaks_b_overlap <- as.numeric(length(which(SP1_HyPB_1kbp_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+PBase_1kbp_a_peaks_b_overlap <- as.numeric(length(which(HyPB_1kbp_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+TTAA_1kbp_a_peaks_b_overlap <- as.numeric(length(which(GenoTTAA$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+
+#Then we can work out percentage of overlapped reads from the number of non-overlapped reads
+Percent_HyPB_1kbp <- (1-(SP1_HyPB_1kbp_a_peaks_b_overlap/SP1_HyPBTotalPeaks))*100
+Percent_PBase_1kbp <- (1-(PBase_1kbp_a_peaks_b_overlap/HyPBTotalPeaks))*100
+Percent_TTAA_1kbp <- (1-(TTAA_1kbp_a_peaks_b_overlap/TTAAtotal))*100
+
+#and we can create a table to plot, Col1=Total reads,Col2= non-overlapped reads
+Final_Percentage_table <- data.frame(Name=c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp'),
+                                     Total=rep(c(SP1_HyPBTotalPeaks, HyPBTotalPeaks, TTAAtotal)),
+                                     Overlap_withChIP= c(SP1_HyPB_1kbp_a_peaks_b_overlap, PBase_1kbp_a_peaks_b_overlap, TTAA_1kbp_a_peaks_b_overlap),
+                                     PercentageOverlapping= c(Percent_HyPB_1kbp, Percent_PBase_1kbp, Percent_TTAA_1kbp))
+
+#Finally, we can now plot
+Figure <- ggplot(data = Final_Percentage_table, 
+                 aes(x= reorder(Name, -PercentageOverlapping), 
+                     y = PercentageOverlapping,
+                     fill = Name)) +  
+                     geom_col(color = "black", show.legend = FALSE) + 
+                     ylim(0, 100) + labs(x = "Name and Distance from ChIP-Seq Peak",                                                                                                                   y = "% of CC peaks overlapping with ChIP-Seq peak",
+                                         title = "Calling Cards and ChIP-Seq Overlap",
+                                         subtitle = "Determining percentage of SP1-HyPB and HyPB peaks within 1000 bp 
+                                                    \nof SP1 ChIP-Seq peaks using ENCODE control") +  
+                     theme_dark() + 
+                     coord_cartesian(expand = FALSE, clip = "off") + 
+                     geom_hline(yintercept = 83, linetype = "dashed", linewidth = 1) 
+
+
+Figure
+########################################################################
+```
+
+The data from Wang et al., 2012, shows that 83% of SP1-PBase peaks were within 250 bp of a SP1 ChIP-Seq peak. I expected to see a similar or better result by using SP1-HyPB as in Moudgil et al., 2020 it was found that 90% of single-cell calling card peaks overlapped with ChIP-Seq peaks. However, as you can see, there was just over 55% overlap in SP1 directed calling cards when testing for overlap with SP1 ChIP-Seq controlled by ENCFF000PBY. Furthermore, I was surprised that the undirected HyPB had such a high overlap with the SP1 ChIP-Seq at just under 50% overlap.  
+
+This was the main reason for repeating this analysis, however, repeating the sample processing did not significantly improve the number of overlapping reads on this plot.
+
+## My SP1-HyPB Calling Card peaks overlap with Mitra controlled SP1 ChIP-Seq
+
+I was able to assess the overlap between the same SP1-HyPB Calling Card peaks file as above with the SP1 ChIP-Seq dataset controlled by ENCFF000PBO. The ggplot generated from this can be seen below.
+
+
+
+
+### Figure 2
+```{r my SP1 + Mitra 1kbp, echo=FALSE, warning=FALSE, message=FALSE}
+#Load software
+library(rgl)
+library(ggplot2)
+library(ggthemes)
+##Process data
+
+# In order to plot the percentage of reads within X base pairs of a CC peak, we needed to run an analysis
+#that increased the window size of reads by X bp, and then search for overlaps between two files
+
+#This has already been done on viking with 0.25 and 1 kbp, so we need to turn the outputs into dataframe
+col_names = c("Chromosome", "Position Start", "Position End", "Number of Overlaps with ChIP-Seq Peaks")
+Genocol_names = c("Chromosome", "Position Start", "Position End", 'notsure', 'notsure', 'notsure',"Number of Overlaps with ChIP-Seq Peaks")
+SP1_HyPB_1kbp_narrow <- read.table("Data/20230912WindowOutputs/SP1-HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed", header = TRUE, sep = "\t", col.names = col_names)
+HyPB_1kbp_narrow <- read.table("Data/20230912WindowOutputs/HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed", header = TRUE, sep = "\t", col.names = col_names)
+GenoTTAA <- read.table("Data/20230925WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_Mitra.bed", header = TRUE, sep = "\t", col.names = Genocol_names)
+
+#Once in the dataframe, we can count how many reads are in each file by the number of lines in each dataframe
+SP1_HyPBTotalPeaks = nrow(SP1_HyPB_1kbp_narrow)
+HyPBTotalPeaks = nrow(HyPB_1kbp_narrow)
+TTAAtotal = nrow(GenoTTAA)
+#Then we count the number of reads with no overlap - this is denoted by a '0' in the overlap column
+
+SP1_HyPB_1kbp_a_peaks_b_overlap <- as.numeric(length(which(SP1_HyPB_1kbp_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+PBase_1kbp_a_peaks_b_overlap <- as.numeric(length(which(HyPB_1kbp_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+TTAA_1kbp_a_peaks_b_overlap <- as.numeric(length(which(GenoTTAA$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+
+#Then we can work out percentage of overlapped reads from the number of non-overlapped reads
+Percent_HyPB_1kbp <- (1-(SP1_HyPB_1kbp_a_peaks_b_overlap/SP1_HyPBTotalPeaks))*100
+Percent_PBase_1kbp <- (1-(PBase_1kbp_a_peaks_b_overlap/HyPBTotalPeaks))*100
+Percent_TTAA_1kbp <- (1-(TTAA_1kbp_a_peaks_b_overlap/TTAAtotal))*100
+
+#and we can create a table to plot, Col1=Total reads,Col2= non-overlapped reads
+Final_Percentage_table <- data.frame(Name=c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp'),
+                                     Total=rep(c(SP1_HyPBTotalPeaks, HyPBTotalPeaks, TTAAtotal)),
+                                     Overlap_withChIP= c(SP1_HyPB_1kbp_a_peaks_b_overlap, PBase_1kbp_a_peaks_b_overlap, TTAA_1kbp_a_peaks_b_overlap),
+                                     PercentageOverlapping= c(Percent_HyPB_1kbp, Percent_PBase_1kbp, Percent_TTAA_1kbp))
+
+#Finally, we can now plot
+Figure <- ggplot(data = Final_Percentage_table, 
+                 aes(x= reorder(Name, -PercentageOverlapping), 
+                     y = PercentageOverlapping,
+                     fill = Name)) +  geom_col(color = "black",
+                                               show.legend = FALSE) +  ylim(0, 100) + labs(x = "Name and Distance from ChIP-Seq Peak", 
+                                                                                           y = "% of CC peaks overlapping with ChIP-Seq peak",
+                                                                                           title = "Calling Cards and ChIP-Seq Overlap",
+                                                                                           subtitle = "Determining percentage of SP1-HyPB and HyPB peaks within 1000 bp \nof SP1 ChIP-Seq peaks using Mitra control") +  theme_dark() + coord_cartesian(expand = FALSE, clip = "off") + geom_hline(yintercept = 83, linetype = "dashed", linewidth = 1) 
+
+
+Figure
+
+
+########################################################################
+
+
+```
+
+As you can see, there is a very significant jump in the amount of reads overlapping with the ChIP-Seq dataset for both SP1 directed and undirected calling cards. I was concerned at both how much of a difference there was between the differently controlled ChIP-Seq and at how consistently high the undirected calling cards overlapped with ChIP-Seq peaks.
+
+
+## Provided calling card peaks overlap with both ENCODE and Mitra controlled SP1 ChIP-Seq
+
+After checking my code, I couldn't identify where I had gone wrong in my analysis. I therefore wanted to see whether I could more faithfully re-create the Wang et al., 2012 figure 3A by using the peak files provided in GSE148448_RAW. Below are both of the plots comparing the provided SP1-HyPB calling card peaks overlap with ChIP-Seq peaks controlled by both ENCFF000PBO and ENCFF000PBY
+
+
+
+
+
+### Figure 3
+```{r Mitra SP1 with ENCODE ChIP 1kbp, echo=FALSE, warning=FALSE, message=FALSE}
+#Load software
+library(rgl)
+library(ggplot2)
+library(ggthemes)
+##Process data
+
+# In order to plot the percentage of reads within X base pairs of a CC peak, we needed to run an analysis
+#that increased the window size of reads by X bp, and then search for overlaps between two files
+
+#This has already been done on viking with 0.25 and 1 kbp, so we need to turn the outputs into dataframe
+col_names = c("Chromosome", "Position Start", "Position End", "Number of insertions", "Number of Overlaps with ChIP-Seq Peaks")
+Genocol_names = c("Chromosome", "Position Start", "Position End", 'notsure', 'notsure', 'notsure',"Number of Overlaps with ChIP-Seq Peaks")
+SP1_HyPB_M_1kbp_narrow <- read.table("Data/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/1kb_Windowoutput_MitraSP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed", header = TRUE, sep = "\t", col.names = col_names)
+HyPB_1kbp_M_narrow <- read.table("Data/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/undirected/1kb_Windowoutput_MitraHyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed", header = TRUE, sep = "\t", col.names = col_names)
+GenoTTAA <- read.table("Data/20230925WindowOutputs/TTAA_win_SP1ChIP/ENCODE/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_ENCODE.bed", header = TRUE, sep = "\t", col.names = Genocol_names)
+
+#Once in the dataframe, we can count how many reads are in each file by the number of lines in each dataframe
+SP1_HyPB_M_TotalPeaks = nrow(SP1_HyPB_M_1kbp_narrow)
+HyPB_M_TotalPeaks = nrow(SP1_HyPB_M_1kbp_narrow)
+TTAAtotal = nrow(GenoTTAA)
+#Then we count the number of reads with no overlap - this is denoted by a '0' in the overlap column
+
+SP1_HyPB_M_1kbp_a_peaks_b_overlap <- as.numeric(length(which(SP1_HyPB_M_1kbp_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+HyPB_M_1kbp_a_peaks_b_overlap <- as.numeric(length(which(HyPB_1kbp_M_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+TTAA_1kbp_a_peaks_b_overlap <- as.numeric(length(which(GenoTTAA$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+
+#Then we can work out percentage of overlapped reads from the number of non-overlapped reads
+Percent_SP1_HyPB_1kbp_M <- (1-(SP1_HyPB_M_1kbp_a_peaks_b_overlap/SP1_HyPB_M_TotalPeaks))*100
+Percent_HyPB_1kbp_M <- (1-(HyPB_M_1kbp_a_peaks_b_overlap/HyPB_M_TotalPeaks))*100
+Percent_TTAA_1kbp <- (1-(TTAA_1kbp_a_peaks_b_overlap/TTAAtotal))*100
+
+#and we can create a table to plot, Col1=Total reads,Col2= non-overlapped reads
+Final_Percentage_table <- data.frame(Name=c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp'),
+                                     Total=rep(c(SP1_HyPB_M_TotalPeaks, HyPB_M_TotalPeaks, TTAAtotal)),
+                                     Overlap_withChIP= c(SP1_HyPB_M_1kbp_a_peaks_b_overlap, HyPB_M_1kbp_a_peaks_b_overlap, TTAA_1kbp_a_peaks_b_overlap),
+                                     PercentageOverlapping= c(Percent_SP1_HyPB_1kbp_M, Percent_HyPB_1kbp_M, Percent_TTAA_1kbp))
+
+#Finally, we can now plot
+graphorder= c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp')
+Figure <- ggplot(data = Final_Percentage_table, 
+                 aes(x= factor(Name, graphorder), 
+                     y = PercentageOverlapping,
+                     fill = Name)) +  geom_col(color = "black",
+                                               show.legend = FALSE) +  ylim(0, 100) + labs(x = "Name and Distance from ChIP-Seq Peak", 
+                                                                                           y = "% of CC peaks overlapping with ChIP-Seq peak",
+                                                                                           title = "Calling Cards and ChIP-Seq Overlap",
+                                                                                           subtitle = "Determining percentage of SP1-HyPB and HyPB peaks from Mitra \npeak files within 1000 bp of SP1 ChIP-Seq peaks using \nENCODE control") +  theme_dark() + coord_cartesian(expand = FALSE, clip = "off") + geom_hline(yintercept = 83, linetype = "dashed", linewidth = 1) 
+
+
+Figure
+
+
+########################################################################
+
+
+
+```
+
+
+
+
+### Figure 4
+```{r Mitra SP1 with Mitra ChIP 1kbp, echo=FALSE, warning=FALSE, message=FALSE}
+#Load software
+library(rgl)
+library(ggplot2)
+library(ggthemes)
+##Process data
+
+# In order to plot the percentage of reads within X base pairs of a CC peak, we needed to run an analysis
+#that increased the window size of reads by X bp, and then search for overlaps between two files
+
+#This has already been done on viking with 0.25 and 1 kbp, so we need to turn the outputs into dataframe
+col_names = c("Chromosome", "Position Start", "Position End", "Number of insertions", "Number of Overlaps with ChIP-Seq Peaks")
+Genocol_names = c("Chromosome", "Position Start", "Position End", 'notsure', 'notsure', 'notsure',"Number of Overlaps with ChIP-Seq Peaks")
+SP1_HyPB_MM_1kbp_narrow <- read.table("Data/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/1kb_Windowoutput_MitraSP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed", header = TRUE, sep = "\t", col.names = col_names)
+HyPB_1kbp_MM_narrow <- read.table("Data/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/undirected/1kb_Windowoutput_MitraHyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed", header = TRUE, sep = "\t", col.names = col_names)
+GenoTTAA_MM <- read.table("Data/20230925WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_Mitra.bed", header = TRUE, sep = "\t", col.names = Genocol_names)
+
+#Once in the dataframe, we can count how many reads are in each file by the number of lines in each dataframe
+SP1_HyPB_MM_TotalPeaks = nrow(SP1_HyPB_MM_1kbp_narrow)
+HyPB_MM_TotalPeaks = nrow(HyPB_1kbp_MM_narrow)
+TTAAtotal_MM = nrow(GenoTTAA_MM)
+#Then we count the number of reads with no overlap - this is denoted by a '0' in the overlap column
+
+SP1_HyPB_M_1kbp_a_peaks_b_overlap <- as.numeric(length(which(SP1_HyPB_MM_1kbp_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+HyPB_MM_1kbp_a_peaks_b_overlap <- as.numeric(length(which(HyPB_1kbp_MM_narrow$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+TTAA_MM_1kbp_a_peaks_b_overlap <- as.numeric(length(which(GenoTTAA_MM$Number.of.Overlaps.with.ChIP.Seq.Peaks==0)))
+
+#Then we can work out percentage of overlapped reads from the number of non-overlapped reads
+Percent_SP1_HyPB_1kbp_MM <- (1-(SP1_HyPB_M_1kbp_a_peaks_b_overlap/SP1_HyPB_MM_TotalPeaks))*100
+Percent_HyPB_1kbp_MM <- (1-(HyPB_MM_1kbp_a_peaks_b_overlap/HyPB_MM_TotalPeaks))*100
+Percent_TTAA_1kbp_MM <- (1-(TTAA_MM_1kbp_a_peaks_b_overlap/TTAAtotal_MM))*100
+
+#and we can create a table to plot, Col1=Total reads,Col2= non-overlapped reads
+Final_Percentage_table <- data.frame(Name=c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp'),
+                                     Total=rep(c(SP1_HyPB_MM_TotalPeaks, HyPB_MM_TotalPeaks, TTAAtotal_MM)),
+                                     Overlap_withChIP= c(SP1_HyPB_M_1kbp_a_peaks_b_overlap, HyPB_MM_1kbp_a_peaks_b_overlap, TTAA_MM_1kbp_a_peaks_b_overlap),
+                                     PercentageOverlapping= c(Percent_SP1_HyPB_1kbp_MM, Percent_HyPB_1kbp_MM, Percent_TTAA_1kbp_MM))
+
+#Finally, we can now plot
+graphorder= c('SP1-HyPB 1kbp', 'Undirected HyPB 1kbp', 'Genomic TTAA 1kbp')
+Figure <- ggplot(data = Final_Percentage_table, 
+                 aes(x= factor(Name, graphorder), 
+                     y = PercentageOverlapping,
+                     fill = Name)) +  geom_col(color = "black",
+                                               show.legend = FALSE) +  ylim(0, 100) + labs(x = "Name and Distance from ChIP-Seq Peak", 
+                                                                                           y = "% of CC peaks overlapping with ChIP-Seq peak",
+                                                                                           title = "Calling Cards and ChIP-Seq Overlap",
+                                                                                           subtitle = "Determining percentage of SP1-HyPB and HyPB peaks from Mitra \npeak files within 1000 bp of SP1 ChIP-Seq peaks using \nMitra control") +  theme_dark() + coord_cartesian(expand = FALSE, clip = "off") + geom_hline(yintercept = 83, linetype = "dashed", linewidth = 1) 
+
+
+Figure
+
+
+########################################################################
+
+
+
+```
+
+I was very surprised to see that both of the undirected calling cards overlapped more with the SP1 ChIP-Seq than the SP1 directed calling cards and it appears that the overlap of the SP1 directed peaks overlap is not up to the 83% found in Wang et al., 2012. 
+
+I appreciate that these two papers are not the same and I didn't expect the plots to be a completely identical replication of the Wang et al., 2012 figure using the Moudgil et al., 2020 dataset. However I didn't expect the differences between them to be so large. 
+
+Could you please help me to understand why I have been unable to use the custom code on Arnhav's GitHub to re-create the peak files you have provided in GSE148448_RAW and why you chose the SP1 ChIP-Seq input control ENCFF000PBO.
