@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it using the metadata below."
+title: "Thesis"
+authors:
+  - family-n: "Stenning"
+    given-n: "Jack"
+version: "0.1.0"
+date-released: "2025-11-26"
+url: "https://github.com/JackStenning/Thesis"
+# If you mint a DOI (see instructions below), add it here as:
+# doi: "10.5281/zenodo.<your-doi-suffix>"
