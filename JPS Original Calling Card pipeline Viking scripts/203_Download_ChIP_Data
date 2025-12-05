@@ -1,0 +1,62 @@
+############ Script 203 - Download data ############
+
+#Set up working directories
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/
+mkdir HCT116_ChIP_Seq_processing
+cd HCT116_ChIP_Seq_processing
+mkdir SP1
+mkdir BRD4
+
+###Get files to these directories
+##SP1 Fastq, Bam and Input fastq and bam
+#FASTQ
+cd SP1
+mkdir FASTQ
+cd FASTQ
+curl  -L -o ENCFF000PCT.fastq.gz https://www.encodeproject.org/files/ENCFF000PCT/@@download/ENCFF000PCT.fastq.gz
+
+#BAM
+cd ../
+mkdir BAM
+cd BAM
+curl -L -o ENCFF190AVI.bam https://www.encodeproject.org/files/ENCFF190AVI/@@download/ENCFF190AVI.bam
+
+### Input controls
+#### NOTE - it appears the Mitra paper used the wrong input, the ENCODE data suggests that
+#### ENCFF000PBY is correct. However, the paper suggests they used ENCFF000PBO
+#### This is a different protocol number and appears to be run in a different way
+#### Download and process both and compare the difference between the two
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+mkdir input
+mkdir input/Mitra
+mkdir input/ENCODE
+
+#Download Mitra input
+cd input/Mitra
+curl -L -o ENCFF000PBO.fastq.gz https://www.encodeproject.org/files/ENCFF000PBO/@@download/ENCFF000PBO.fastq.gz
+mkdir BAM
+cd BAM
+curl -L -o ENCFF501FYY.bam https://www.encodeproject.org/files/ENCFF501FYY/@@download/ENCFF501FYY.bam
+
+#Download ENCODE input
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+curl -L -o ENCFF000PBY.fastq.gz https://www.encodeproject.org/files/ENCFF000PBY/@@download/ENCFF000PBY.fastq.gz
+
+
+##BRD4 Fastq, bw and Input fastq and bw
+#FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4
+mkdir FASTQ
+cd FASTQ
+curl -L -o SRR2481799.fastq.gz https://www.be-md.ncbi.nlm.nih.gov/Traces/sra-reads-be/fastq?acc=SRR2481799&clipped=1
+
+#BW - for both  SRR2481799 and SRR2481800 - downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73319
+# Selected only the runs I wanted and manually transferred for ease
+
+#input 
+mkdir input
+cd input
+curl -L -o SRR2481800.fastq.gz https://www.be-md.ncbi.nlm.nih.gov/Traces/sra-reads-be/fastq?acc=SRR2481800&clipped=1
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/

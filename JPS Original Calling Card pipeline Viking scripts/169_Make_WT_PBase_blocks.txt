@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=wt_PBase_Blocks	 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=30gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+. ../../059_install_python_dependancies.txt
+source activate Callingcardspy
+
+#Create WT PBase blocks
+
+bedtools sort -i GSM4471636_HCT-116_PBase.ccf.txt > GSM4471636_HCT-116_PBase_sorted.qbed
+python ../../SegmentCCF.py GSM4471636_HCT-116_PBase_sorted.qbed | sed -e '/^\s*$/d' > GSM4471636_HCT-116_PBase.blocks
+
+
+
+sbatch 170_Call_WT_PBase_peaks.txt

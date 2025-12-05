@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --job-name=Annotateinsert	 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=2                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+module load bio/SAMtools/1.9-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+source activate Callingcardspy
+
+
+for dir in workingCCdata/202306_JS_BulkCC/*; do
+	cd "$dir"
+	for file in *tagged2.bam; do
+		python ../../../AnnotateInsertionSites.py \
+		    --transposase PB \
+		    -f \
+		    "$file" \
+		    /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.2bit \
+ 		   "$file"_final.bam
+		done
+	for mile in *mapped.bam_tagged.bam_tagged2.bam_final.bam; do
+            mv "$mile" "${mile%%mapped.bam_tagged.bam_tagged2.bam_final.bam}final.bam"
+        done
+	cd  /mnt/lustre/groups/biol-hic-2020/jack
+done

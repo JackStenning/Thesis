@@ -1,0 +1,41 @@
+#!/bin/bash
+#SBATCH --job-name=WT2samtoBW		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+#Purge exisiting modules to prevent conflict
+
+module purge
+module load bio/deepTools/3.5.1-foss-2021b
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#Begin processing from .fastq to sam, from .sam to .bam - sorting, indexing, making bedgraph and followed by conversion to bigwig
+
+####### NOTE CHECK WHICH GENOME SHOULD BE USED #######
+
+######## This script is only applicable for hg38 alignments ########
+
+for file in workingCCdata/202306_JS_BulkCC/WT2/*.sam; do
+	module purge
+	module load bio/deepTools/3.5.1-foss-2021b
+	module load bio/BWA/0.7.17-foss-2019b
+	module load bio/SAMtools/1.9-foss-2018b
+	module load bio/BEDTools/2.30.0-GCC-11.2.0
+   	echo "$file"
+	samtools view -S -b "$file" > "$file".bam
+	samtools sort "$file".bam -o "$file"_sorted_hg38.bam
+	samtools index "$file"_sorted_hg38.bam
+	bedtools genomecov -ibam "$file"_sorted_hg38.bam -bg -scale 35 > "$file".bedgraph
+	sort -k1,1 -k2,2n "$file".bedgraph > "$file"_sorted.bedgraph
+	module purge
+	module load bio/Kent_tools/407-gompi-2020a
+	bedGraphToBigWig "$file"_sorted.bedgraph  https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes "$file".bw
+	done
+

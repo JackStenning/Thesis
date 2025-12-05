@@ -1,0 +1,10 @@
+
+#!/bin/sh
+for file in workingCCdata/*/; do
+   	echo "$file"ù
+   	cd "$file"
+	gunzip *ccf.txt.gz
+	echo "$file done"
+	cd ..
+	done
+	cd ..

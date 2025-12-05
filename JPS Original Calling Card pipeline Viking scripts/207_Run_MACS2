@@ -1,0 +1,53 @@
+#!/bin/bash
+
+############ Script 207 - Run MACS2 ############
+## NOTE - BRD4 and SP1 ChIP was processed with different parameters 
+
+#Loading modules
+module purge
+module load bio/MACS2/2.2.7.1-foss-2019b-Python-3.7.4
+
+#Process SP1 FASTQ with Mitra control
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+mkdir MACS2
+mkdir MACS2/Mitra_input
+mkdir MACS2/ENCODE_input
+macs2 callpeak -t ENCFF000PCT_filtered_sorted_hg38.bed \
+	-c input/Mitra/ENCFF000PBO_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	--keep-dup auto \
+	-q 0.05 \
+	-n SP1_ChIP_Mitra_input \
+	--outdir MACS2/Mitra_input
+
+#Process SP1 FASTQ with ENCODE control
+macs2 callpeak -t ENCFF000PCT_filtered_sorted_hg38.bed \
+	-c input/ENCODE/ENCFF000PBY_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	--keep-dup auto \
+	-q 0.05 \
+	-n SP1_ChIP_ENCODE_controlinput \
+	--outdir MACS2/ENCODE_input
+
+
+#FILES DOWNLOADED AS BAM FILES HAVE NOT BEEN PROCESSED, ONLY PROCESS IF THERE IS AN ISSUE WITH THESE FILES
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+mkdir MACS2
+macs2 callpeak -t SRR2481799_filtered_sorted_hg38.bed \
+	-c input/SRR2481800_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	-p 1e-9 \
+	-s 50 \
+	--keep-dup auto \
+	-n SP1_ChIP_ENCODE_controlinput \
+	--outdir MACS2
+
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+

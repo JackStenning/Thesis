@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python BamToCallingCard.py -i workingCCdata/HCT-116/GSM4471639_HCT-116_SP1-HyPBase.bam > workingCCdata/HCT-116/GSM4471639_HCT-116_SP1-HyPBase.bed

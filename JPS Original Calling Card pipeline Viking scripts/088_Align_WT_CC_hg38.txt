@@ -1,0 +1,70 @@
+#!/bin/bash
+#SBATCH --job-name=WT1_6_align 		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=240gb                      # Job memory request
+#SBATCH --time=48:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+#Purge exisiting modules to prevent conflict
+
+module purge
+module load bio/deepTools/3.5.1-foss-2021b
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+
+####### NOTE CHECK WHICH GENOME SHOULD BE USED #######
+
+######## This script is only applicable for hg38 alignments ########
+
+#WT1
+bwa mem -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT1/WT1_EKDL230008858-1A_HF552DSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT1/WT1_EKDL230008858-1A_HF552DSX7_L2_1_aligned.sam
+
+
+bwa mem -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT1/WT1_EKDL230008858-1A_HFK3FDSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT1/WT1_EKDL230008858-1A_HFK3FDSX7_L2_1_aligned.sam
+
+
+#WT2
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT2/WT2_EKDL230008858-1A_HF552DSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT2/WT2_EKDL230008858-1A_HF552DSX7_L2_1_aligned.sam
+
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT2/WT2_EKDL230008858-1A_HFK3FDSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT2/WT2_EKDL230008858-1A_HFK3FDSX7_L2_1_aligned.sam
+
+
+
+#WT3
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT3/WT3_EKDL230008858-1A_HF552DSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT3/WT3_EKDL230008858-1A_HF552DSX7_L2_1_aligned.sam
+
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT3/WT3_EKDL230008858-1A_HFK3FDSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT3/WT3_EKDL230008858-1A_HFK3FDSX7_L2_1_aligned.sam
+
+# WT 4
+
+bwa mem -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT4/WT4_EKDL230008858-1A_HF552DSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT4/WT4_EKDL230008858-1A_HF552DSX7_L2_1and2_aligned.sam
+
+
+bwa mem -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT4/WT4_EKDL230008858-1A_HFK3FDSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT4/WT4_EKDL230008858-1A_HFK3FDSX7_L2_1and2_aligned.sam
+
+
+
+
+#WT5
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT5/WT5_EKDL230008858-1A_HF552DSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT5/WT5_EKDL230008858-1A_HF552DSX7_L2_1_aligned.sam
+
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT5/WT5_EKDL230008858-1A_HFK3FDSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT5/WT5_EKDL230008858-1A_HFK3FDSX7_L2_1_aligned.sam
+
+#WT6
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT6/WT6_EKDL230008858-1A_HF552DSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT6/WT6_EKDL230008858-1A_HF552DSX7_L2_1_aligned.sam
+
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa workingCCdata/202306_JS_BulkCC/WT6/WT6_EKDL230008858-1A_HFK3FDSX7_L2_1.fq > workingCCdata/202306_JS_BulkCC/WT6/WT6_EKDL230008858-1A_HFK3FDSX7_L2_1.sam
+
+sbatch 088_Align_WT_CC_hg38.txt
+

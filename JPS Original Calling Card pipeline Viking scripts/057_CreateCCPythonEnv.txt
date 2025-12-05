@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+module load bio/SAMtools/1.9-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+conda env create -f Callingcardspy.yaml
+conda info --envs
+

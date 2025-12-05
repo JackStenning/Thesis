@@ -1,0 +1,20 @@
+#!/bin/bash
+############ Script 205 - re-running Bam processing that failed in 204 O/N (Same code used) ############
+#Loading modules
+module purge
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+samtools sort ENCFF190AVI.bam -o ENCFF190AVI_sorted_hg38.bam
+samtools index ENCFF190AVI_sorted_hg38.bam
+
+
+#Mitra BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra/BAM
+samtools sort ENCFF501FYY.bam -o ENCFF501FYY_sorted_hg38.bam
+samtools index ENCFF501FYY_sorted_hg38.bam
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/

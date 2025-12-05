@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=WT_indexcut		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+module load bio/cutadapt/3.4-GCCcore-10.3.0
+
+
+#First step is to cut off teh barcode and surrounding adapter
+#For WT calling cards in this experiment, the barcode is the same - CGT
+
+cd workingCCdata/
+for direct in 202306_JS_BulkCC/WT*; do
+cd "$direct"
+	for file in *TrimmedBC.fq; do
+		cutadapt \
+		-a CTGTCTCTTATACACATCTCCGAGCCCACGAGACTNNNNNNNNNNTCTCGTATGCCGTCTTCTGCTTG \
+		--minimum-length 1 \
+		-o "$file"_fulltrimmed.fastq \
+		"$file"
+	done
+	cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/
+done
+cd /mnt/lustre/groups/biol-hic-2020/jack

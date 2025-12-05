@@ -1,0 +1,8 @@
+#!/bin/bash
+cd processedCCdata/20230712_ER_qBEDfiles
+bedtools sort -i ER_HyPB_HF552DSX7_L2_1.qbed > ER_HyPB_HF552DSX7_L2_1_sorted.qbed
+bedtools sort -i ER_HyPB_HFK3FDSX7_L2_1.qbed > ER_HyPB_HFK3FDSX7_L2_1_sorted.qbed
+bedtools sort -i WT_HyPB_HF552DSX7_L2_1.qbed > WT_HyPB_HF552DSX7_L2_1_sorted.qbed
+bedtools sort -i WT_HyPB_HFK3FDSX7_L2_1.qbed > WT_HyPB_HFK3FDSX7_L2_1_sorted.qbed
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/

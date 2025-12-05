@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#Copies bw and bedgraph files from workingCCdata
+
+for dir in workingCCdata/*; do
+	cd /mnt/lustre/groups/biol-hic-2020/jack/"$dir"
+	mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/pre230212/"$dir"
+	cp *.bedgraph /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/pre230212/"$dir"
+	cp *.bw /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/pre230212/"$dir"
+	echo "Files from $dir were copied"
+	cd ../..
+	done

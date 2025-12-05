@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd 202306_JS_BulkCC
+for dir in *; do
+	cd "$dir"
+	echo "$dir"
+	for file1 in *HF552DSX7_L2_1.fq.gz; do
+		for file2 in *HFK3FDSX7_L2_1.fq.gz; do
+			cat "$file1" "$file2" > "$dir"_EKDL230008858_combo.fq.gz
+			done
+		done
+	cd /mnt/scratch/users/jps558/Stenning_Data_Analysis/202306_JS_BulkCC
+	done
+cd cd /mnt/scratch/users/jps558/Stenning_Data_Analysis

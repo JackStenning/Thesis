@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd ../../workingChipdata
+for dir in HCT116*; do
+	mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230816_HCT_filtered/"$dir"
+	cd "$dir"
+	for file in *.bed; do
+		echo 'Copying "$file"'
+		cp "$file" /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230816_HCT_filtered/"$dir"
+		done
+	cd ../
+	done 
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT-116_WT_HyPB_PB_+-SP1

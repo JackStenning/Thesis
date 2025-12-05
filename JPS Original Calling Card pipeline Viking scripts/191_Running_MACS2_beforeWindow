@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --job-name=filt_SP1_MACS2	 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=4                       # Run on a single CPU
+#SBATCH --mem=70gb                       # Job memory request
+#SBATCH --time=05:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+module load bio/MACS2/2.2.7.1-foss-2019b-Python-3.7.4
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2
+
+macs2 callpeak -t ENCFF000PCT_sorted_hg38.bam_filtered_sorted.bed \
+	-c input/ENCFF000PBY_sorted_hg38.bam_filtered_sorted.bed \
+	-f BED \
+	-g 3.04e+9 \
+	-n filtered_SP1_ChIP \
+	--outdir MACS2
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis

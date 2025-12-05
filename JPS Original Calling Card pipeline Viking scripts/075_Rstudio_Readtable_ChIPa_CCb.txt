@@ -1,0 +1,76 @@
+#Bedtools intersect used to link genomic locations with overlap
+#data was then loaded into R for analysis
+
+#Below was used to get files into R as a table
+
+col_names = c('chrom_np', 'chromStart_np', 'chromEnd_np', 'name_np', 'score_np', 'strand_np', 'signalValue_np', 'pValue_np', 'qValue_np', 'peak_np', 'chrom_qbed', 'chromStart_qbed', 'chromEnd_qbed', 'insertValue_qbed', 'strand_qbed', 'overlapLength' )
+ChIPoverlap_df = read.table('SP1intersect_ChIPa_CCb.bed' , sep = '\t', header = TRUE, col.names = col_names)
+
+#Then we can begin to plot
+
+library(ggplot2)
+library(ggthemes)
+
+
+#With log scale on CC
+ggplot(data = ChIPoverlap_df, aes(x = ChIPoverlap_df$signalValue_np, y = ChIPoverlap_df$insertValue_qbed)) +
+    geom_point() +
+    labs(x = "SP1 ChIP-Seq Overall Enrichment", y = "Total Reads at Calling Card Insertion site (log10)", title = "Enrichment at Overlapping SP1 Calling Cards and ChIP-Seq loci") +
+    theme_classic() +
+    scale_y_log10() 
+
+#All CC range
+ggplot(data = ChIPoverlap_df, aes(x = ChIPoverlap_df$signalValue_np, y = ChIPoverlap_df$insertValue_qbed)) +
+    	geom_point() +
+    	labs(x = "SP1 ChIP-Seq Overall Enrichment", y = "Total Reads at Calling Card Insertion site log10", title = "Enrichment at Overlapping SP1 Calling Cards and ChIP-Seq loci") +
+    	theme_classic() + 
+	ylim(c(0, 30000))
+
+
+#I then wanted to scale colour based on the amount of overlapping features so I needed to run script 076 on Viking
+#The output was transferred over and converted to R dataframe
+#scales package is needed
+
+newcol_names = c('chrom_np', 'chromStart_np', 'chromEnd_np', 'name_np', 'score_np', 'strand_np', 'signalValue_np', 'pValue_np', 'qValue_np', 'peak_np', 'No._of_Overlapping_reads')
+ChIPoverlap_withcount_df = read.table('SP1intersect_ChIPa_CCb_withcount.bed' , sep = '\t', header = TRUE, col.names = newcol_names)
+
+#Error said that there was an issue with fill - the as.numeric will help it be seen as a number 
+
+#That didnt help, the issue is because the file lengths are different
+#script 077 was run to add count to end of ChIP overlap
+
+col_names2 = c('chrom_np', 'chromStart_np', 'chromEnd_np', 'name_np', 'score_np', 'strand_np', 'signalValue_np', 'pValue_np', 'qValue_np', 'peak_np', 'chrom_qbed', 'chromStart_qbed', 'chromEnd_qbed', 'insertValue_qbed', 'strand_qbed', 'overlapLength', 'No._of_Overlapping_reads' )
+countedChIPoverlap_df = read.table('SP1intersect_ChIPa_CCb_withcountappend.bed' , sep = '\t', header = TRUE, col.names = col_names2)
+
+#Then tried to colour based on amount of inserts
+
+ggplot(data = ChIPoverlap_df, aes(x = ChIPoverlap_df$signalValue_np, y = ChIPoverlap_df$insertValue_qbed)) +
+  geom_point(aes(fill = countedChIPoverlap_df$No._of_Overlapping_reads)) +
+  scale_fill_gradient(low = "darkblue", high = "lightblue",
+                      breaks = rescale(c(min(countedChIPoverlap_df$No._of_Overlapping_reads),
+                                         max(countedChIPoverlap_df$No._of_Overlapping_reads))),
+                      labels = rescale(c(min(countedChIPoverlap_df$No._of_Overlapping_reads),
+                                          max(countedChIPoverlap_df$No._of_Overlapping_reads))))+
+	labs(x = "SP1 ChIP-Seq Overall Enrichment", y = "Total Reads at Calling Card Insertion site (log10)", title = "Enrichment at Overlapping SP1 Calling Cards and ChIP-Seq loci") +
+   	theme_classic() +
+   	scale_y_log10()
+
+#This caused a fatal error
+
+After re-running, the error wasnt fatal, but it didnt work - try again tomorrow
+
+####################################### Below is an edit for future use ############################################################################################################################################################
+
+
+
+ggplot(data = ChIPoverlap_df, aes(x = ChIPoverlap_df$signalValue_np, y = ChIPoverlap_df$insertValue_qbed)) +
+  geom_point(aes(fill = countedChIPoverlap_df$No._of_Overlapping_reads)) +
+  scale_fill_gradient(low = "darkblue", high = "lightblue",
+                      breaks = rescale(c(min(countedChIPoverlap_df$No._of_Overlapping_reads),
+                                         max(countedChIPoverlap_df$No._of_Overlapping_reads))),
+                      labels = rescale(c(min(countedChIPoverlap_df$No._of_Overlapping_reads),
+                                          max(countedChIPoverlap_df$No._of_Overlapping_reads))))+
+	labs(x = "SP1 ChIP-Seq Overall Enrichment", y = "Total Reads at Calling Card Insertion site (log10)", title = "Enrichment at Overlapping SP1 Calling Cards and ChIP-Seq loci") +
+   	theme_classic() +
+   	scale_y_log10()
+	

@@ -1,0 +1,70 @@
+#!/bin/bash
+
+module load bio/FastQC/0.11.7-Java-1.8.0_181
+for file in workingCCdata/202306_JS_BulkCC/ER2/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/ER2/*.fq; do
+fastqc $fast
+done
+
+for file in workingCCdata/202306_JS_BulkCC/ER3/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/ER3/*.fq; do
+fastqc $fast
+done
+
+for file in workingCCdata/202306_JS_BulkCC/ER5/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/ER5/*.fq; do
+fastqc $fast
+done
+
+for file in workingCCdata/202306_JS_BulkCC/ER6/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/ER6/*.fq; do
+fastqc $fast
+done
+
+for file in workingCCdata/202306_JS_BulkCC/WT1/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/WT1/*.fq; do
+fastqc $fast
+done
+for file in workingCCdata/202306_JS_BulkCC/WT2/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/WT2/*.fq; do
+fastqc $fast
+done
+for file in workingCCdata/202306_JS_BulkCC/WT3/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/WT3/*.fq; do
+fastqc $fast
+done
+for file in workingCCdata/202306_JS_BulkCC/WT4/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/WT4/*.fq; do
+fastqc $fast
+done
+for file in workingCCdata/202306_JS_BulkCC/WT5/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/WT5/*.fq; do
+fastqc $fast
+done
+for file in workingCCdata/202306_JS_BulkCC/WT6/*.fq.gz; do
+gunzip $file
+done
+for fast in workingCCdata/202306_JS_BulkCC/WT6/*.fq; do
+fastqc $fast
+done
+
+
+

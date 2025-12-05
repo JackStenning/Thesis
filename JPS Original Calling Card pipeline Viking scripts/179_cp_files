@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230816_HCT_PBase_ccf_peakcall/

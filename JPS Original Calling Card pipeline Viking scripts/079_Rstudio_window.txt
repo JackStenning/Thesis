@@ -1,0 +1,46 @@
+#Bedtools window used to link genomic locations with overlap
+#data was then loaded into R for analysis
+
+#Below was used to get files into R as a table
+
+window_col_names = c('chrom_qbed', 'chromStart_qbed', 'chromEnd_qbed', 'insertValue_qbed', 'strand_qbed', 'chrom_np', 'chromStart_np', 'chromEnd_np', 'name_np', 'score_np', 'strand_np', 'signalValue_np', 'pValue_np', 'qValue_np', 'peak_np')
+CC_1000bp_window_df = read.table('SP1window_CCa_ChIPb.bed' , sep = '\t', header = TRUE, col.names = window_col_names)
+
+#Then we can begin to plot
+
+library(ggplot2)
+library(ggthemes)
+
+ggplot(data = CC_1000bp_window_df, aes(x = CC_1000bp_window_df$signalValue_np, y = CC_1000bp_window_df$insertValue_qbed)) +
+  geom_point(alpha = 0.05) +
+  labs(x = "SP1 ChIP-Seq Overall Enrichment", y = "Total Reads at Calling Card Insertion site (log10)", title = "Enrichment at Overlapping SP1 Calling Cards and ChIP-Seq loci") +
+  theme_classic() +
+  scale_y_log10() + 
+  scale_x_log10()
+
+#now I'll try to set up  a linear regression 
+
+library(stats)
+CC_win_reg <- lm(CC_1000bp_window_df$insertValue_qbed ~ CC_1000bp_window_df$signalValue_np, data = CC_1000bp_window_df)
+
+coefficients <- coef(CC_win_reg)
+std_errors <- sqrt(diag(vcov(CC_win_reg)))
+
+#Using this, we can make a df with these variables
+CC_win_reg_results.df <- data.frame(Coefficients = names(coefficients),
+                                      Estimate = coefficients,
+                                      Std.Error = std_errors,
+                                      stringsAsFactors = FALSE)
+output_file <- "./Plots/20230629/CCwindow_regression.csv"
+write.csv(CC_win_reg_results.df, file = output_file, row.names = FALSE)
+##above are the stats from lm
+
+#Try this for the plot
+ggplot(data = CC_1000bp_window_df, aes(x = CC_1000bp_window_df$signalValue_np, y = CC_1000bp_window_df$insertValue_qbed)) +
+	geom_point(alpha = 0.05) +
+	labs(x = "SP1 ChIP-Seq Overall Enrichment", y = "Total Reads at Calling Card Insertion site (log10)", title = "Enrichment at Overlapping SP1 Calling Cards and ChIP-Seq loci") +
+	theme_classic() +
+	scale_y_log10() + 
+	scale_x_log10()+
+  geom_smooth(method='lm')
+plot

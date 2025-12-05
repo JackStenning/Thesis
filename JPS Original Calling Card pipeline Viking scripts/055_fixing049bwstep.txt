@@ -1,0 +1,7 @@
+#!/bin/bash 
+for file in workingCCdata/HCT-116/*sorted.bedgraph; do
+	module purge
+	module load bio/Kent_tools/407-gompi-2020a
+   	echo "$file"
+	bedGraphToBigWig "$file"  https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes "$file".bw
+	done

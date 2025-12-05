@@ -1,0 +1,11 @@
+#!/bin/bash
+module load lang/Miniconda3
+source activate Callingcardspy
+pip3 install twobitreader
+pip3 install pysam
+pip3 install numpy
+pip3 install pandas
+pip3 install scipy
+pip3 install statsmodels
+pip3 install pybedtools
+pip3 install astropy

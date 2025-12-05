@@ -1,0 +1,19 @@
+#!/bin/bash
+
+module load BEDTools/2.30.0-GCC-11.2.0
+
+
+bedtools sort -i GSM29704_90_combined.bed > GSM29704_90_combined_sorted.bed
+
+awk '$1 !~ /_/' GSM29704_90_combined_sorted.bed > GSM29704_90_combined_cleaned.bed
+awk '$1 !~ /_/' GSM2970404_A90_peaks.bed > GSM2970404_A90_peaks_cleaned.bed
+
+
+for file in *cleaned.bed; do
+	sed -e 's/ /\t/g' "$file" > "$file"_toconvert.bed
+	bedtools genomecov -i "$file"_toconvert.bed -bg -g human.hg38.genome > "$file".bedgraph
+	./Kent/bedGraphToBigWig GSM29704_90_combined_cleaned.bed.bedgraph  https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes GSM29704_90_combined.bw
+	./Kent/bedGraphToBigWig GSM2970404_A90_peaks_cleaned.bed.bedgraph  https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes GSM2970404_A90_peaks.bw
+	done
+cd ../../../
+

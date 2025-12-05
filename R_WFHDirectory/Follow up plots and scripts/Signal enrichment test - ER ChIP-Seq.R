@@ -11,25 +11,28 @@
 # libraries
 library(GenomicRanges)
 library(rtracklayer)
-library(GenomicAlignments) # not strictly required here but often useful
+library(GenomicAlignments)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(ggpubr)
+
 #Set working directory
 setwd("C:/Users/jps558/OneDrive - University of York/Desktop/R_WorkingDirectory/R_WFHDirectory") 
+
 # -----------------------------
 # 0. Parameters & file paths
 # -----------------------------
+
 pyCCcol_names <- c("Chr","Start","End","Center","ExpIns","BackIns","RefIns",
                    "pRef","pBack","FracExp","TPHexp","FracBack","TPHback",
                    "TPHbackSub","padjRef")
 
-high_path <- "peaks/peak_data_ER_WT2.bed"     # High calling-card peaks (your file)
-low_path  <- "peaks/peak_data_ER_WT4.bed"     # Low calling-card peaks  (your file)
+high_path <- "peaks/peak_data_ER_WT2.bed"     
+low_path  <- "peaks/peak_data_ER_WT4.bed"     
 
-bw_geo    <- "peaks/SRR6652020_A90.bw"        # GEO bigWig (your file)
-bw_encode <- "peaks/ENCFF063JMY.bw"           # ENCODE bigWig (your file)
+bw_geo    <- "peaks/SRR6652020_A90.bw"        
+bw_encode <- "peaks/ENCFF063JMY.bw"        
 
 expand_flank <- 1000    # ±1kb expansion
 shuffle_seeds_high <- c(101, 102, 103)
@@ -38,6 +41,7 @@ shuffle_seeds_low  <- c(201, 202, 203)
 # -----------------------------
 # 1. Read pyCC peak files as tables (preserve float columns)
 # -----------------------------
+
 message("Reading pyCC peak files as tables...")
 high_df <- read.table(high_path, header = TRUE, sep = "\t", col.names = pyCCcol_names, comment.char = "", stringsAsFactors = FALSE)
 low_df  <- read.table(low_path,  header = TRUE, sep = "\t", col.names = pyCCcol_names, comment.char = "", stringsAsFactors = FALSE)
@@ -62,6 +66,7 @@ message("Number of peaks: High = ", length(High_peaks), ", Low = ", length(Low_p
 # -----------------------------
 # 2. Expand peaks ±1kb
 # -----------------------------
+
 expand_peaks <- function(gr, flank = 1000) {
   # ensure boundaries are >=1 after expansion
   gr_exp <- resize(gr, width = width(gr) + 2*flank, fix = "center")
@@ -75,12 +80,14 @@ Low_peaks_exp  <- expand_peaks(Low_peaks,  expand_flank)
 # -----------------------------
 # 3. Get genome seqlengths from one of the bigWigs
 # -----------------------------
+
 message("Reading BigWig header to obtain genome seqlengths (this does not import all signal)...")
 seqlens <- seqlengths(import(bw_geo, which=GRanges())) # import(...) with empty which reads header
 # fallback if that returns NA or empty, try import without which (may be heavy)
 if(is.null(seqlens) || length(seqlens) == 0) {
   seqlens <- seqlengths(import(bw_geo))
 }
+
 # filter to remove NA lengths
 seqlens <- seqlens[!is.na(seqlens)]
 message("Chromosomes available from bigWig: ", paste(names(seqlens), collapse=", "))
@@ -89,6 +96,7 @@ message("Chromosomes available from bigWig: ", paste(names(seqlens), collapse=",
 # 4. Function to create matched shuffled peaks (match chr counts & widths)
 #    Note: shuffle is done BEFORE expansion; we then expand each shuffled set
 # -----------------------------
+
 shuffle_matched <- function(peaks, seqlens, seed=1) {
   set.seed(seed)
   # match chromosome distribution
@@ -132,6 +140,7 @@ if(length(Low_shufs[[1]])  != length(Low_peaks_exp))  warning("Some Low shuffled
 #    This imports only the regions overlapping peaks (fastish) and computes a
 #    length-weighted mean score per peak (so wide overlaps handled properly).
 # -----------------------------
+
 extract_mean_signal_from_bigwig <- function(bw_file, peaks) {
   # import the bigWig only for the ranges of interest (this produces a GRanges of segments with 'score')
   message("Importing BigWig for ", length(peaks), " peaks from ", bw_file, " (this may still take some time)...")
@@ -184,6 +193,7 @@ Low_encode_sh_signals  <- unlist(lapply(Low_shufs,  function(sh) extract_mean_si
 # 7. Statistical tests
 #    Wilcoxon rank-sum (Mann-Whitney) and simple empirical p-value vs 3 shuffles
 # -----------------------------
+
 message("Performing statistical tests...")
 
 # function to compute empirical p-value given observed vector and list/vector of shuffled signals

@@ -1,0 +1,27 @@
+
+#!/bin/bash
+#SBATCH --job-name=samtosortedbedgraph   # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=30gb                       # Job memory request
+#SBATCH --time=20:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+module purge
+module load bio/deepTools/3.5.1-foss-2021b
+module load bio/SAMtools/1.9-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+for file in workingChipdata/HCT116_SP1/*.sam; do
+   	echo "$file"
+	samtools view -S -b "$file" > "$file".bam
+	samtools sort "$file".bam -o "$file".bam_sorted_hg.bam
+	samtools index "$file".bam_sorted_hg.bam
+	bedtools genomecov -ibam "$file".bam_sorted_hg.bam -bg -scale 35 > "$file".bedgraph
+	sort -k1,1 -k2,2n "$file".bedgraph > "$file"_sorted.bedgraph
+	done
+
+
+
+

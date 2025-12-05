@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --job-name=BamtoCC		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+#Make sure python environment is active before starting this script.
+
+for file in workingCCdata/202306_JS_BulkCC/*; do
+	cd $file
+	echo "python BamToCallingCard.py -i *sorted_hg38.bam > *.bed"
+	cd /mnt/lustre/groups/biol-hic-2020/jack/
+	done

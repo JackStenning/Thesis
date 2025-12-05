@@ -1,0 +1,15 @@
+#################### SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir /mnt/d/VikingAlternative/D\ drive\ WFH/VikingAlternative/20230915WindowOutputs
+
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/GSM4471637_HCT-116_SP1-PBase_filtered_fdr_bh_0.05_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230915WindowOutputs/SP1_PBase/Mitra/1kb_Windowoutput_SP1-PBase_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/GSM4471637_HCT-116_SP1-PBase_filtered_fdr_bh_0.05_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230915WindowOutputs/SP1_PBase/ENCODE/1kb_Windowoutput_SP1-PBase_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/GSM4471636_HCT-116_PBase_filtered_p9_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak >  /mnt/d/D\ drive\ WFH/VikingAlternative/20230915WindowOutputs/Undirected/Mitra/1kb_Windowoutput_PBase_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/GSM4471636_HCT-116_PBase_filtered_p9_peaks.bed  -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230915WindowOutputs/Undirected/ENCODE/1kb_Windowoutput_PBase_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed

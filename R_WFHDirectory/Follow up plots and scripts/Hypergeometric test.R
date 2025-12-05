@@ -10,7 +10,7 @@ library(GenomicRanges)
 setwd("C:/Users/jps558/OneDrive - University of York/Desktop/R_WorkingDirectory/R_WFHDirectory") 
 
 
-# === 1) Load BED files ===
+# ===  Load BED files ===
 load_bed <- function(file) {
   bed <- read.table(file, stringsAsFactors = FALSE, header = FALSE)
   # BED: chrom, start, end
@@ -90,7 +90,7 @@ pval <- phyper(k-1, K, N-K, n, lower.tail = FALSE)
 cat("Hypergeometric enrichment p-value:", pval, "\n")
 
 
-# === 7) Optional: Fisher exact test ===
+# Optional: Fisher exact test 
 cont_table <- matrix(c(k, n-k, K-k, N-K-(n-k)),
                      nrow = 2, byrow = TRUE)
 rownames(cont_table) <- c("Calling-cards", "Other_TTAA")
@@ -98,6 +98,6 @@ colnames(cont_table) <- c("ChIA-PET", "Not_ChIA-PET")
 fisher_res <- fisher.test(cont_table, alternative = "greater")
 cat("Fisher exact p-value (enrichment):", fisher_res$p.value, "\n")
 
-# === 8) Enrichment fold ===
+# Enrichment fold 
 enrichment <- (k/n) / (K/N)
 cat("Enrichment (observed / expected):", enrichment, "\n")

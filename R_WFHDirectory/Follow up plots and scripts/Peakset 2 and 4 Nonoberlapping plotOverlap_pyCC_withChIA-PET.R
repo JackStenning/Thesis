@@ -167,7 +167,6 @@ Percentage_ESR1_pyCC_2_GEO_Anchor1 =(1-(ESR1_pyCC_2_GEO_Anchor1_overlap/ESR1_pyC
 Percentage_ESR1_pyCC_4_Anchor2 = (1-(ESR1_pyCC_4_Anchor2_overlap/ESR1_pyCC_4_total))*100
 
 #Create table to plot
-#Create table to plot
 pyCC_Finalpercentage_table = data.frame(Name=c('Peakset_4_Encode_Anchor1', 'Peakset_4_Encode_Anchor2', 'Peakset_4_GEO_Anchor1', 'Peakset_4_GEO_Anchor2'),
                                         Total=rep(c(ESR1_pyCC_2_total, ESR1_pyCC_2_total, ESR1_pyCC_4_total, ESR1_pyCC_4_total)),
                                         Overlap_withChIP= c(ESR1_pyCC_2_encode_Anchor1_overlap, ESR1_pyCC_2_encode_Anchor2_overlap, ESR1_pyCC_2_GEO_Anchor1_overlap, ESR1_pyCC_4_Anchor2_overlap),

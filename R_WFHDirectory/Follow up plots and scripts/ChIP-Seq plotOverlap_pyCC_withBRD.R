@@ -1,5 +1,7 @@
 ############# LOOK HERE ######################
 #add or delete the '#' symbol below on install packages
+############# LOOK HERE ######################
+
 #install.packages("Rtools")
 #install.packages("ggthemes")
 
@@ -54,7 +56,7 @@ Percentage_Encode_Liu =(1-(Encode_Liu_overlap/ESR1_pyCC_4_total))*100
 Percentage_Encode_Zhang = (1-(Encode_Zhang_overlap/ESR1_pyCC_4_total))*100
 
 #Create table to plot
-#Create table to plot
+
 pyCC_Finalpercentage_table = data.frame(Name=c('GEO_Liu', 'GEO_Zhang', 'Encode_Liu', 'Encode_Zhang'),
                                        Total=rep(c(ESR1_pyCC_2_total, ESR1_pyCC_2_total, ESR1_pyCC_4_total, ESR1_pyCC_4_total)),
                                        Overlap_withChIP= c(GEO_Liu_overlap, GEO_Zhang_overlap, Encode_Liu_overlap, Encode_Zhang_overlap),

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+############ Script 211 - Filter and create Blocks ############
+
+#Load modules
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+
+##Filter
+#SP1-HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+gunzip *.gz
+bedtools sort -i GSM4471639_HCT-116_SP1-HyPBase.ccf.txt > GSM4471639_HCT-116_SP1-HyPBase_sorted.qbed
+bedops -n -1 GSM4471639_HCT-116_SP1-HyPBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed
+echo "done SP1-HyPB"
+
+#SP1-PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+gunzip *.gz
+bedtools sort -i GSM4471637_HCT-116_SP1-PBase.ccf.txt > GSM4471637_HCT-116_SP1-PBase_sorted.qbed
+bedops -n -1 GSM4471637_HCT-116_SP1-PBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed
+echo "done SP1-PBase"
+
+#HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+gunzip *.gz
+bedtools sort -i GSM4471638_HCT-116_HyPBase.ccf.txt > GSM4471638_HCT-116_HyPBase_sorted.qbed
+bedops -n -1 GSM4471638_HCT-116_HyPBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed
+echo "done HyPB"
+
+#PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+gunzip *.gz
+bedtools sort -i GSM4471636_HCT-116_PBase.ccf.txt > GSM4471636_HCT-116_PBase_sorted.qbed
+bedops -n -1 GSM4471636_HCT-116_PBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471636_HCT-116_PBase_filtered_sorted.qbed
+echo "done PBase"
+
+#Check its done
+echo "Done Filtering"
+
+##Blocks
+#Load python environment
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+source activate Callingcardspy
+
+#SP1-HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471639_HCT-116_SP1-HyPBase_filtered.blocks
+echo "done SP1-HyPB"
+
+#SP1-PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471637_HCT-116_SP1-PBase_filtered.blocks
+echo "done SP1-PBase"
+
+#HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471638_HCT-116_HyPBase_filtered.blocks
+echo "done HyPB"
+
+#PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471636_HCT-116_PBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471636_HCT-116_PBase_filtered.blocks
+echo "done PBase"
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/

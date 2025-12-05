@@ -1,0 +1,9 @@
+cd /mnt/scratch/users/jps558/Stenning_Data_Analysis
+mkdir homer
+cd homer
+
+wget http://homer.ucsd.edu/homer/configureHomer.pl
+
+perl /mnt/scratch/users/jps558/Stenning_Data_Analysis/homer/configureHomer.pl -install
+
+perl configureHomer.pl -install hg38

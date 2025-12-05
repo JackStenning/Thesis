@@ -1,0 +1,35 @@
+#/bin/bash
+
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_SP1
+
+#SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+bedtools window -c -a GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_peaks.narrowPeak > output/1kb_Windowoutput_SP1-HyPB_CCpeaks_ChIPnarrowpeak.bed
+
+#SP1-HyPB CCpeaks compared to SP1 ChIP summits - 1kbp
+bedtools window -c -a GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_summits.bed > output/1kb_Windowoutput_SP1-HyPB_CCpeaks_ChIPsummits.bed
+
+##SP1-PB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+bedtools window -c -a GSM4471637_HCT-116_SP1-PBase_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_peaks.narrowPeak > output/1kb_Windowoutput_SP1-PBase_CCpeaks_ChIPnarrowpeak.bed
+
+#SP1-HyPB CCpeaks compared to SP1 ChIP summits - 1kbp
+bedtools window -c -a GSM4471637_HCT-116_SP1-PBase_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_summits.bed > output/1kb_Windowoutput_SP1-PBase_CCpeaks_ChIPsummits.bed
+
+###################################### re-run with 250bp window
+
+#SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 250bp
+bedtools window -c -w 250 -a GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_peaks.narrowPeak > output/0.25kb_Windowoutput_SP1-HyPB_CCpeaks_ChIPnarrowpeak.bed
+
+#SP1-HyPB CCpeaks compared to SP1 ChIP summits - 250bp
+bedtools window -c -w 250 -a GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_summits.bed > output/0.25kb_Windowoutput_SP1-HyPB_CCpeaks_ChIPsummits.bed
+
+##SP1-PB CCpeaks compared to SP1 Chip narrowpeak - 250bp
+bedtools window -c -w 250 -a GSM4471637_HCT-116_SP1-PBase_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_peaks.narrowPeak > output/0.25kb_Windowoutput_SP1-PBase_CCpeaks_ChIPnarrowpeak.bed
+
+#SP1-HyPB CCpeaks compared to SP1 ChIP summits - 250bp
+bedtools window -c -w 250 -a GSM4471637_HCT-116_SP1-PBase_fdr_bh_0.05_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/MACS2/filtered_SP1_ChIP_summits.bed > output/0.25kb_Windowoutput_SP1-PBase_CCpeaks_ChIPsummits.bed
+
+
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/

@@ -1,0 +1,6 @@
+#!/bin/sh
+module purge
+module load bio/BWA/0.7.17-foss-2019b
+cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg18
+bwa index -p hg18 -a bwtsw hg18.fa
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/Wang_2012

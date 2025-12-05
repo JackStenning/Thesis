@@ -1,0 +1,3 @@
+#!/bin/sh
+
+wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz' -O hg38.fa.gz

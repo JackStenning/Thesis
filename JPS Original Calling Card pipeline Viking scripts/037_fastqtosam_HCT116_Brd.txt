@@ -1,0 +1,15 @@
+
+#!/bin/bash
+#SBATCH --time=20:00:00 # Maximum time (24:00:00)
+#SBATCH --nodes=1
+#SBATCH --mem=30gb
+
+for file in workingChipdata/HCT116_SP1/*.fastq; do
+   	echo "$file"
+	bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_Brd4/GRCh38.d1.vd1.fa "$file" > "$file"_alignedtest.sam
+	echo "$file done"
+	done
+
+
+
+

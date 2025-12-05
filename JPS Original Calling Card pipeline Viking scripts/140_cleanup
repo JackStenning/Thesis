@@ -1,0 +1,16 @@
+#!/bin/bash
+
+for dir in workingCCdata/202306_JS_BulkCC/*; do
+	cd "$dir"
+	for file in *Trimmed*; do
+		rm "$file"
+		done
+	for dile in *.sam; do
+		rm "$dile"
+		done
+	for mile in *.bam*; do
+		rm "$mile"
+		done
+	cd /mnt/lustre/groups/biol-hic-2020/jack
+	done
+

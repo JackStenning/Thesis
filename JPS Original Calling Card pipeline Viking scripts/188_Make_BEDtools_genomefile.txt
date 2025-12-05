@@ -1,0 +1,17 @@
+#!/bin/bash
+
+module purge
+module load bio/deepTools/3.5.1-foss-2021b
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38
+#samtools faidx hg38.fa
+#awk -v OFS='\t' {'print $1,$2'} hg38.fa.fai > hg38_genomeFile.txt
+
+#not surte the above is correct, so going to use Chrom.sizes from UCSC
+curl https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes -o hg38.chrom.sizes
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT-116_WT_HyPB_PB_+-SP1
+echo 'now running 187_furtherProcess_aligned_SP1_input.txt'
+. 187_furtherProcess_aligned_SP1_input.txt

@@ -1,0 +1,27 @@
+#/bin/bash
+
+####################### THE SUMMIT FILE WAS TAKEN OFF AS IT REDUCED THE AMOUNT OF OVERLAPPING READS FOUND #######################
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_Hy_PB
+
+#HyPB CCpeaks compared to BRD4 Chip narrowpeak - 1kbp
+
+bedtools window -c -a GSM4471638_HCT-116_HyPBase_filtered_p30_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230823Newoutputs/1kb_Windowoutput_HyPB_CCpeaks_BRD4ChIPnp.bed
+
+##PBase CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+bedtools window -c -a GSM4471636_HCT-116_PBase_filtered_p30_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230823Newoutputs/1kb_Windowoutput_PBase_CCpeaks_BRD4ChIPnp.bed
+
+
+###################################### re-run with 250bp window
+
+#HyPB CCpeaks compared to BRD4 Chip narrowpeak - 250bp
+bedtools window -c -w 250 -a GSM4471638_HCT-116_HyPBase_filtered_p30_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230823Newoutputs/0.25kb_Windowoutput_HyPB_CCpeaks_BRD4ChIPnp.bed
+
+##PBase CCpeaks compared to SP1 Chip narrowpeak - 250bp
+bedtools window -c -w 250 -a GSM4471636_HCT-116_PBase_filtered_p30_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230823Newoutputs/0.25kb_Windowoutput_PBase_CCpeaks_BRD4ChIPnp.bed
+
+
+
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/

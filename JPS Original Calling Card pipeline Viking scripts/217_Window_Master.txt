@@ -1,0 +1,123 @@
+############ Script 217 - Run bedtools on Mitra peak files ############ 
+cd /mnt/wsl
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/Mitrapeaks 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/Mitrapeaks/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/undirected 
+mkdir /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/undirected 
+
+############################################################	1000 bp window search ############################################################					
+#################### SP1-PBase CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+##Mitra control
+#Get rid of columns
+awk '{print $1, $2, $3, $4}' /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/Moudgil_peaks/GSM4471637_HCT-116_SP1-PBase_peaks.tsv > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peakstocon.bed
+
+#get rid of header
+sed -i '1d' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peakstocon.bed
+
+#convert to BED
+sed -e 's/ /\t/g' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peakstocon.bed > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peaks.bed 
+
+#run window
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/1kb_Windowoutput_MitraSP1-PBase_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/Mitrapeaks/1kb_Windowoutput_MitraSP1-PBase_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT PBase CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+##Mitra control
+#Get rid of columns
+awk '{print $1, $2, $3, $4}' /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/Moudgil_peaks/GSM4471636_HCT-116_PBase_peaks.tsv > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peakstocon.bed
+
+#get rid of header
+sed -i '1d' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peakstocon.bed
+
+#convert to BED
+sed -e 's/ /\t/g' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peakstocon.bed > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peaks.bed 
+
+#run window
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak >  /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/undirected/1kb_Windowoutput_MitraPBase_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peaks.bed  -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/Mitrapeaks/undirected/1kb_Windowoutput_MitraPBase_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+
+#################### SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+##Mitra control
+#Get rid of columns
+awk '{print $1, $2, $3, $4}' /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB/Moudgil_peaks/GSM4471639_HCT-116_SP1-HyPBase_peaks.tsv > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peakstocon.bed
+
+#get rid of header
+sed -i '1d' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peakstocon.bed
+
+#convert to BED
+sed -e 's/ /\t/g' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peakstocon.bed > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peaks.bed 
+
+#run window
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/1kb_Windowoutput_MitraSP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/1kb_Windowoutput_MitraSP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+##Mitra control
+#Get rid of columns
+awk '{print $1, $2, $3, $4}' /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB/Moudgil_peaks/GSM4471638_HCT-116_HyPBase_peaks.tsv > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peakstocon.bed
+
+#get rid of header
+sed -i '1d' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peakstocon.bed
+
+#convert to BED
+sed -e 's/ /\t/g' /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peakstocon.bed > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peaks.bed 
+
+#Run winddow
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak >  /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/undirected/1kb_Windowoutput_MitraHyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/undirected/1kb_Windowoutput_MitraHyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+############################################################	250 bp window search ############################################################
+#################### SP1-PBase CCpeaks compared to SP1 Chip narrowpeak - 0.25kbp
+##Mitra control
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/0.25kb_Windowoutput_MitraSP1-PBase_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471637_HCT-116_SP1-PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/Mitrapeaks/0.25kb_Windowoutput_MitraSP1-PBase_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT PBase CCpeaks compared to SP1 Chip narrowpeak - 0.25kbp
+
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak >  /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/undirected/0.25kb_Windowoutput_MitraPBase_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/Mitra/Mitrapeaks/GSM4471636_HCT-116_PBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_PBase/ENCODE/Mitrapeaks/undirected/0.25kb_Windowoutput_MitraPBase_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+
+#################### SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 0.25kbp
+##Mitra control
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/0.25kb_Windowoutput_MitraSP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471639_HCT-116_SP1-HyPBase_peaks.bed  -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/0.25kb_Windowoutput_MitraSP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT HyPB CCpeaks compared to SP1 Chip narrowpeak - 0.25kbp
+
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peaks.bed -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak >  /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/undirected/0.25kb_Windowoutput_MitraHyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+##ENCODE control
+./bedtools window -c -w 250 -a /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/Mitra/Mitrapeaks/GSM4471638_HCT-116_HyPBase_peaks.bed  -b /mnt/d/D\ drive\ WFH/VikingBackup230914/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > /mnt/d/D\ drive\ WFH/VikingAlternative/20230925WindowOutputs/SP1_HyPB/ENCODE/Mitrapeaks/undirected/0.25kb_Windowoutput_MitraHyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+cd /mnt/d/D\ drive\ WFH/VikingAlternative/

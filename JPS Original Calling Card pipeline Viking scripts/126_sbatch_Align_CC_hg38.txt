@@ -1,0 +1,16 @@
+#!/bin/bash
+
+sbatch 115_AlignER1_CC_hg38.txt
+sbatch 116_AlignER2_CC_hg38.txt
+sbatch 117_AlignER3_CC_hg38.txt
+sbatch 118_AlignER5_CC_hg38.txt
+sbatch 119_AlignER6_CC_hg38.txt
+sbatch 120_AlignWT1_CC_hg38.txt
+sbatch 121_AlignWT2_CC_hg38.txt
+sbatch 122_AlignWT3_CC_hg38.txt
+sbatch 123_AlignWT4_CC_hg38.txt
+sbatch 124_AlignWT5_CC_hg38.txt
+sbatch 125_AlignWT6_CC_hg38.txt
+
+
+

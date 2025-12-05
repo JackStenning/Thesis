@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#!/bin/bash
+#SBATCH --time=20:00:00 # Maximum time (24:00:00) 
+#SBATCH --nodes=1
+#SBATCH --mem=30gb
+
+module load bio/SAMtools/1.9-foss-2018b
+
+samtools view -S -b SRR2481799_aligned_hg.sam > SRR2481799_aligned_hg.bam
+
+samtools sort SRR2481799_aligned_hg.bam -o SRR2481799_sorted_hg.bam
+
+samtools index SRR2481799_sorted_hg.bam
+
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+bedtools genomecov -ibam SRR2481799_sorted_hg.bam -bg -scale 35 > SRR2481799_hg.bedgraph
+
+sort -k1,1 -k2,2n SRR2481799_hg.bedgraph > SRR2481799_hg_sorted.bedgraph
+
+module load bio/Kent_tools/407-gompi-2020a
+
+bedGraphToBigWig SRR2481799_hg_sorted.bedgraph https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes SRR2481799_hg_sorted.bw
+
+

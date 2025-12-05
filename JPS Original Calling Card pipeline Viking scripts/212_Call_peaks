@@ -1,0 +1,64 @@
+#!/bin/bash
+#SBATCH --job-name=CallCCpeaks   	# Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=18gb                       # Job memory request
+#SBATCH --time=06:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+
+############ Script 212 - Call peaks ############
+
+#module load
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+
+#Load python environment
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+source activate Callingcardspy
+
+#Call WT PBase peaks with p value cut off at 1e^-9
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_BRD4.py -p 9 -d 12500 \
+	-i GSM4471636_HCT-116_PBase_filtered_p9_intermediate.csv \
+	GSM4471636_HCT-116_PBase_filtered_sorted.qbed \
+	GSM4471636_HCT-116_PBase_filtered.blocks \
+	/mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+	GSM4471636_HCT-116_PBase_filtered_p9_peaks.bed
+
+
+#Call SP1-PBase peaks
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_TF.py -a 0.05 -m fdr_bh -d 250 -x 5000 \
+	-i GSM4471637_HCT-116_SP1-PBase_filtered_intermediate.csv \
+	GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed \
+	GSM4471637_HCT-116_SP1-PBase_filtered.blocks \
+	../../Undirected_Hy_PBase/PBase/GSM4471636_HCT-116_PBase_filtered.blocks\
+	GSM4471637_HCT-116_SP1-PBase_filtered_fdr_bh_0.05_peaks.bed
+
+
+#Call WT HyPB peaks with p value cut off at 1e^-9
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_BRD4.py -p 9 -d 12500 \
+	-i GSM4471638_HCT-116_HyPBase_filtered_p9_intermediate.csv \
+	GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed \
+	GSM4471638_HCT-116_HyPBase_filtered.blocks \
+	/mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+	GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed
+
+
+#Call SP1-HyPB peaks
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_TF.py -a 0.05 -m fdr_bh -d 250 -x 5000 \
+	-i GSM4471639_HCT-116_SP1-HyPBase_filtered_intermediate.csv \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered.blocks \
+	../../Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered.blocks \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/

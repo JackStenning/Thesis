@@ -1,0 +1,6 @@
+#!/bin/bash
+
+wget hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
+tar -zxvf chromFa.tar.gz
+cat chr*.fa > hg19.fa
+cd ../..

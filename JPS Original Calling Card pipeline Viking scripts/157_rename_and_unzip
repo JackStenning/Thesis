@@ -1,0 +1,6 @@
+#!/bin/bash
+for file in *PB*; do
+    new_name="${file}.fastq.gz"
+    mv "$file" "$new_name"
+done
+gunzip *.gz

@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --job-name=indexhg38     	# Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=50gb                       # Job memory request
+#SBATCH --time=03:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38
+bwa index -p hg38 -a bwtsw hg38.fa
+
+cd /mnt/lustre/groups/biol-hic-2020/jack
+sbatch 204_ChIP_FastqtoBam
+sbatch 204_2_ChIP_FastqtoBamsplit

@@ -1,0 +1,6 @@
+#!/bin/bash
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+cat ER*HF552DSX7_L2_1_.qbed | bedtools sort -i > ER_HyPB_HF552DSX7_L2_1.qbed
+cat ER*HFK3FDSX7_L2_1_.qbed | bedtools sort -i > ER_HyPB_HFK3FDSX7_L2_1.qbed
+cat WT*HF552DSX7_L2_1_.qbed | bedtools sort -i > WT_HyPB_HF552DSX7_L2_1.qbed
+cat WT*HFK3FDSX7_L2_1_.qbed | bedtools sort -i > WT_HyPB_HFK3FDSX7_L2_1.qbed

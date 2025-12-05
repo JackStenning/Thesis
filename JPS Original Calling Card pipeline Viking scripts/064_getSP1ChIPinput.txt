@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/backup/rawChipdata/HCT116_SP1
+wget https://www.encodeproject.org/files/ENCFF000PBY/@@download/ENCFF000PBY.fastq.gz 
+cp ENCFF000PBY.fastq.gz ../../../workingChipdata/HCT116_SP1/Input/
+cd ../../../

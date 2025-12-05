@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --job-name=ER3_align		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+##### NOTE CHECK WHICH GENOME SHOULD BE USED #######
+
+######## This script is only applicable for hg38 alignments ########
+
+for file in workingCCdata/202306_JS_BulkCC/ER3/*fulltrimmed.fastq; do
+	module purge
+	module load bio/deepTools/3.5.1-foss-2021b
+	module load bio/BWA/0.7.17-foss-2019b
+	module load bio/SAMtools/1.9-foss-2018b
+	module load bio/BEDTools/2.30.0-GCC-11.2.0
+   	echo "$file"
+	bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa "$file" > "$file".sam
+	done

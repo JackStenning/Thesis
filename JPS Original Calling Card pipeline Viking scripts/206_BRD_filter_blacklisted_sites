@@ -1,0 +1,32 @@
+#!/bin/bash
+
+##### 	IF USING THIS SCRIPT CITE THE FOLLOWING PAPER FOR BLACKLIST #######
+### https://www.nature.com/articles/s41598-019-45839-z ###
+
+#Use this to get the blacklist, it has been # here becasue it was already done
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist
+#cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist
+# File was manually downloaded from https://github.com/Boyle-Lab/Blacklist/blob/master/lists/hg38-blacklist.v2.bed.gz and uploaded to the HPC
+#gunzip *.gz
+
+
+#Loading modules
+module purge
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+bedtools bamtobed -i SRR2481799_sorted_hg38.bam > SRR2481799_hg38.bed
+bedtools sort -i SRR2481799_hg38.bed > SRR2481799_sorted_hg38.bed
+bedops -n -1 SRR2481799_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > SRR2481799_filtered_sorted_hg38.bed
+
+#input
+cd input
+bedtools bamtobed -i SRR2481800_sorted_hg38.bam > SRR2481800_hg38.bed
+bedtools sort -i SRR2481800_hg38.bed > SRR2481800_sorted_hg38.bed
+bedops -n -1 SRR2481800_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > SRR2481800_filtered_sorted_hg38.bed
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+

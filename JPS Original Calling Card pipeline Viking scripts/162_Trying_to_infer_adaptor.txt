@@ -1,0 +1,21 @@
+#!/bin/bash
+
+module purge
+#module load bio/AdapterRemovalFixPrefix/0.0.5-Java-1.8.0_212
+#module load bio/AdapterRemoval/2.3.2-GCC-10.3.0
+#AdapterRemoval --file1 Wild-type_PB_Rep_1.fastq_trimBC.fastq --identify-adapters --mate-separator . --interleaved --basename WT_PB
+#AdapterRemoval --file1 Wild-type_PB_Rep_2.fastq_trimBC.fastq --identify-adapters --mate-separator . --interleaved --basename WT_PB
+#The above didnt work so we are trying a python script
+
+module load lang/Miniconda3
+source activate Callingcardspy
+conda install -c bioconda dnapi
+python dnapi.py Wild-type_PB_Rep_1.fastq
+python dnapi.py Wild-type_PB_Rep_2.fastq
+#Both of the above just produced the 5' PB sequence
+python dnapi.py Wild-type_PB_Rep_1.fastq_trimBC.fastq 
+grep TCTAGCTGCATC Wild-type_PB_Rep_1.fastq_trimBC.fastq > WT_1_trimBC_grep_TCTAGCTGCATC.txt
+grep TCTAGCTGCATC WT_1_trimBC_grep_TCTAGCTGCATC.txt 
+
+#The remaining seq after trimming only returned repeated sequence following directly on form the PB insertion, indicating it is just the site with most PB insertions
+

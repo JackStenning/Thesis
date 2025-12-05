@@ -1,1 +1,0 @@
-cmd = peak_data_ER_WT4.bed hg38 Homer/peak_data_ER_WT4 -size 1000 -p 12 -nomotif

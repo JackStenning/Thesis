@@ -1,0 +1,257 @@
+#### This is a compiled list of how the SP1-(Hy)PBase and undirected (Hy)PBase CC was processed to analyse
+#### Moudgil 2020 data
+
+############ Script 210 - Get data and pull out SP1 ############
+
+#Set up directories
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/
+mkdir HCT116_CC_processing
+cd HCT116_CC_processing
+mkdir SP1-Hy_PBase
+mkdir SP1-Hy_PBase/HyPB
+mkdir SP1-Hy_PBase/PBase
+mkdir Undirected_Hy_PBase
+mkdir Undirected_Hy_PBase/HyPB
+mkdir Undirected_Hy_PBase/PBase
+
+
+#Get data
+#curl -L -o GSE148448_RAW.tar ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148448/suppl/GSE148448_RAW.tar
+mkdir RAW
+mv GSE148448_RAW.tar RAW
+
+#Untar data
+cd RAW
+tar -xvf GSE148448_RAW.tar
+
+##Move data to the correct place
+#Undirected PBase
+mv *HCT-116_PBase* ../Undirected_Hy_PBase/PBase
+
+#Undirected HyPB
+mv *HCT-116_HyPBase* ../Undirected_Hy_PBase/HyPB
+
+#SP1-PBase
+mv *HCT-116_SP1-PBase* ../SP1-Hy_PBase/PBase
+
+#SP1-HyPB
+mv *HCT-116_SP1-HyPBase* ../SP1-Hy_PBase/HyPB
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+############ Script 211 - Filter and create Blocks ############
+
+#Load modules
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+
+##Filter
+#SP1-HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+gunzip *.gz
+bedtools sort -i GSM4471639_HCT-116_SP1-HyPBase.ccf.txt > GSM4471639_HCT-116_SP1-HyPBase_sorted.qbed
+bedops -n -1 GSM4471639_HCT-116_SP1-HyPBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed
+echo "done SP1-HyPB"
+
+#SP1-PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+gunzip *.gz
+bedtools sort -i GSM4471637_HCT-116_SP1-PBase.ccf.txt > GSM4471637_HCT-116_SP1-PBase_sorted.qbed
+bedops -n -1 GSM4471637_HCT-116_SP1-PBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed
+echo "done SP1-PBase"
+
+#HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+gunzip *.gz
+bedtools sort -i GSM4471638_HCT-116_HyPBase.ccf.txt > GSM4471638_HCT-116_HyPBase_sorted.qbed
+bedops -n -1 GSM4471638_HCT-116_HyPBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed
+echo "done HyPB"
+
+#PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+gunzip *.gz
+bedtools sort -i GSM4471636_HCT-116_PBase.ccf.txt > GSM4471636_HCT-116_PBase_sorted.qbed
+bedops -n -1 GSM4471636_HCT-116_PBase_sorted.qbed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > GSM4471636_HCT-116_PBase_filtered_sorted.qbed
+echo "done PBase"
+
+#Check its done
+echo "Done Filtering"
+
+##Blocks
+#Load python environment
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+source activate Callingcardspy
+
+#SP1-HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471639_HCT-116_SP1-HyPBase_filtered.blocks
+echo "done SP1-HyPB"
+
+#SP1-PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471637_HCT-116_SP1-PBase_filtered.blocks
+echo "done SP1-PBase"
+
+#HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471638_HCT-116_HyPBase_filtered.blocks
+echo "done HyPB"
+
+#PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/SegmentCCF.py GSM4471636_HCT-116_PBase_filtered_sorted.qbed | sed -e '/^\s*$/d' > GSM4471636_HCT-116_PBase_filtered.blocks
+echo "done PBase"
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+############ Script 212 - Call peaks ############
+
+#module load
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load lang/Miniconda3
+
+#Load python environment
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+. /mnt/lustre/groups/biol-hic-2020/jack/059_install_python_dependancies.txt
+source activate Callingcardspy
+
+#Call WT PBase peaks with p value cut off at 1e^-9
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_BRD4.py -p 9 -d 12500 \
+	-i GSM4471636_HCT-116_PBase_filtered_p9_intermediate.csv \
+	GSM4471636_HCT-116_PBase_filtered_sorted.qbed \
+	GSM4471636_HCT-116_PBase_filtered.blocks \
+	/mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+	GSM4471636_HCT-116_PBase_filtered_p9_peaks.bed
+
+
+#Call SP1-PBase peaks
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_TF.py -a 0.05 -m fdr_bh -d 250 -x 5000 \
+	-i GSM4471637_HCT-116_SP1-PBase_filtered_intermediate.csv \
+	GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed \
+	GSM4471637_HCT-116_SP1-PBase_filtered.blocks \
+	../../Undirected_Hy_PBase/PBase/GSM4471636_HCT-116_PBase_filtered.blocks\
+	GSM4471637_HCT-116_SP1-PBase_filtered_fdr_bh_0.05_peaks.bed
+
+
+#Call WT HyPB peaks with p value cut off at 1e^-9
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_BRD4.py -p 9 -d 12500 \
+	-i GSM4471638_HCT-116_HyPBase_filtered_p9_intermediate.csv \
+	GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed \
+	GSM4471638_HCT-116_HyPBase_filtered.blocks \
+	/mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed \
+	GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed
+
+
+#Call SP1-HyPB peaks
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+python /mnt/lustre/groups/biol-hic-2020/jack/BBPeakCaller_TF.py -a 0.05 -m fdr_bh -d 250 -x 5000 \
+	-i GSM4471639_HCT-116_SP1-HyPBase_filtered_intermediate.csv \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered.blocks \
+	../../Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered.blocks \
+	GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+############ Script 213 - Put into output folder ############
+
+
+#Make processed data folder
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB/Moudgil_peaks
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/Moudgil_peaks
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB/Moudgil_peaks
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/Moudgil_peaks
+
+
+#SP1-HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB/Moudgil_peaks
+
+#SP1-PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/Moudgil_peaks
+
+#HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB/Moudgil_peaks
+
+#PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/Moudgil_peaks
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+############ Script 214 - Use Bedtools window to re-create Wang 2011 fig ############
+
+
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+cd /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing
+
+###### SP1 binding sites distance not yet checked ######
+###### All ChIP files are derived from downloaded and processed FASTQ ######
+
+#Make output directory
+mkdir WindowOutputs
+
+#################### SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir WindowOutputs/SP1-HyPB_win_SP1ChIP
+mkdir WindowOutputs/SP1-HyPB_win_SP1ChIP/Mitra
+mkdir WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE
+bedtools window -c -a /CC/SP1-Hy_PBase/HyPB/GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/SP1-HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a /CC/SP1-Hy_PBase/HyPB/GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b /ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir WindowOutputs/HyPB_win_SP1ChIP
+mkdir WindowOutputs/HyPB_win_SP1ChIP/Mitra
+mkdir WindowOutputs/HyPB_win_SP1ChIP/ENCODE
+bedtools window -c -a /CC/Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a /CC/Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed -b /ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > WindowOutputs/HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### Genomic TTAA compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir WindowOutputs/TTAA_win_SP1ChIP
+mkdir WindowOutputs/TTAA_win_SP1ChIP/Mitra
+mkdir WindowOutputs/TTAA_win_SP1ChIP/ENCODE
+bedtools window -c -a /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed -b /ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_ENCODE.bed
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/

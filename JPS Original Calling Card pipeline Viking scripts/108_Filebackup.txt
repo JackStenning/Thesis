@@ -1,0 +1,37 @@
+#!/bin/bash
+#SBATCH --job-name=BamtoCC		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+
+#MAKE DIRECTORIES then copy
+cd workingCCdata/
+for direct in 202306_JS_BulkCC/*; do
+	mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"
+cd "$direct"
+for file in *.bedgraph; do
+	cp *.bedgraph /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"/
+        done
+for bam in *.bam; do
+	cp *.bam /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"/
+        done
+for sorted in *_sorted.bedgraph; do
+	cp *_sorted.bedgraph /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"/
+        done
+for sbam in *_sorted_hg38.bam; do
+	cp *_sorted_hg38.bam /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"/
+        done
+for index in *_sorted_hg38.bam.bai; do
+	cp *_sorted_hg38.bam.bai /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"/
+        done
+for bw in *.bw; do
+	cp *.bw /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230707_ER/"$direct"/
+        done
+        cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/
+done
+        cd /mnt/lustre/groups/biol-hic-2020/jack

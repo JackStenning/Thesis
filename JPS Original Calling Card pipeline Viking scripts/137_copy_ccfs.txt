@@ -1,0 +1,22 @@
+#!/bin/bash
+cd workingCCdata/202306_JS_BulkCC
+for dir in *; do
+	mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230712_ER_qBEDfiles/"$dir"
+	cd "$dir"
+	for file in *.qbed; do
+		cp "$file" /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230712_ER_qBEDfiles/"$dir"
+	done
+	for dile in *final.bam; do
+		cp "$dile" /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230712_ER_qBEDfiles/"$dir"
+	done
+	for dile in *final.bam.bai; do
+		cp "$dile" /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230712_ER_qBEDfiles/"$dir"
+		cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/202306_JS_BulkCC
+	done
+	for mile in *HFK3FDSX7_L2_1_final.bam.bai; do
+		cp "$mile" /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230712_ER_qBEDfiles/"$dir"
+		cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/202306_JS_BulkCC
+	done
+
+done
+cd /mnt/lustre/groups/biol-hic-2020/jack

@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=ER5               # Job name
+#SBATCH --partition=nodes               # What partition the job should run on
+#SBATCH --time=0-07:00:00               # Time limit (DD-HH:MM:SS)
+#SBATCH --ntasks=1                      # Number of MPI tasks to request
+#SBATCH --cpus-per-task=1               # Number of CPU cores per MPI task
+#SBATCH --mem=150G                        # Total memory to request
+#SBATCH --account=biol-cards-2023        # Project account to use
+#SBATCH --mail-type=END,FAIL            # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk   # Where to send mail
+#SBATCH --output=%x-%j.log              # Standard output log
+#SBATCH --error=%x-%j.err               # Standard error log
+
+## bash cut barcode
+#Load modules
+module load cutadapt/3.4-GCCcore-10.3.0
+
+
+#First step is to cut off the barcode and surrounding adapter
+#For ER calling cards in this experiment, the barcode is the same - CGT
+
+cd 202306_JS_BulkCC/ER5
+for file in *HF5*1.fastq; do
+	cutadapt \
+	-g ^CGTTTTACGCAGACTATCTTTCTAGGGTTAA \
+	    --minimum-length 1 \
+	    --discard-untrimmed \
+	    -e 0 \
+	    --no-indels \
+ 	   -o "$file"TrimmedBC.fq \
+ 	   "$file"
+done
+cd ../
+
+
+
+###bash cut index
+#Load modules
+module load cutadapt/3.4-GCCcore-10.3.0 
+
+#Cut adapt will take degenerate sequence for indexes - NNNNNNNNNN
+cd 202306_JS_BulkCC/
+for dir in ER5; do
+  cd "$dir"
+  echo "Now in "$dir""
+  for file in *HF5*TrimmedBC.fq; do
+  	cutadapt \
+  	-a CTGTCTCTTATACACATCTCCGAGCCCACGAGACTNNNNNNNNNNTCTCGTATGCCGTCTTCTGCTTG \
+  	--minimum-length 1 \
+  	-o "$file"_fulltrimmed.fastq \
+  	"$file"
+  done
+  cd ../
+done
+cd ../
+
+### bash align 
+
+#purge then load modules
+module purge
+module load deepTools/3.5.0-foss-2021a
+module load BWA/0.7.17-foss-2019b
+module load SAMtools/1.16.1-GCC-11.3.0
+module load BEDTools/2.30.0-GCC-11.2.0
+
+cd 202306_JS_BulkCC/
+for dir in ER5; do
+  cd "$dir"
+  echo "Now in "$dir""
+  for file in *HF5*fulltrimmed.fastq; do
+   	echo "Processing "$file""
+	  bwa mem -p -t 40 /mnt/scratch/users/jps558/staging/hg38/hg38.fa "$file" > "$file".sam
+	  done
+	  cd ../
+done
+cd ../
+
+### bash sort to bam
+#Purge then load modules
+		module purge
+		module load SAMtools/1.16.1-GCC-11.3.0
+		
+#Sorting to bam
+cd 202306_JS_BulkCC/
+for dir in ER5; do
+  cd "$dir"
+  echo "now in "$dir""
+	for file in *HF5*.sam; do
+	  echo "$file"
+		samtools view \
+ 	  	 	-bS -h -F 260 \
+ 	  		 "$file" | \
+ 	   		samtools sort - -o "$file"_mapped.bam
+		done
+    cd ../
+done
+cd ../
+### bash tag barcodes
+
+#Purge then load modules
+module purge
+module load SAMtools/1.16.1-GCC-11.3.0
+module load BEDTools/2.30.0-GCC-11.2.0
+
+#Activate python environment
+module load Miniconda3
+
+### Set up env
+cd 202306_JS_BulkCC/
+python3 -m venv .CallingCardsPy2
+source .CallingCardsPy2/bin/activate
+python3 -m pip install pyparsing twobitreader pysam numpy pandas scipy statsmodels pybedtools astropy
+cd ../
+
+cd 202306_JS_BulkCC/
+command -v python
+source activate CallingCardsPy2
+command -v python
+python3 -m pip install twobitreader pysam numpy pandas scipy statsmodels pybedtools astropy
+
+
+#Tag barcodes
+#Purge then load modules
+module purge
+module load SAMtools/1.16.1-GCC-11.3.0
+module load BEDTools/2.30.0-GCC-11.2.0
+
+#Activate python environment
+module load Miniconda3/23.5.2-0
+#Activate python environment
+
+command -v python
+source activate CallingCardsPy2
+command -v python
+python3 -m pip install twobitreader pysam numpy pandas scipy statsmodels pybedtools astropy
+
+#Tag barcodes
+cd 202306_JS_BulkCC/
+for direct in ER5; do
+cd "$direct"
+	for file in *HF5*mapped.bam; do
+		python ../../TagBam.py \
+ 		   --tag XP:Z:CGT \
+ 		   "$file" \
+ 		   "$file"_tagged.bam	
+	done
+	cd ../
+done
+cd ../
+
+### Bash tag index
+#ER5
+cd 202306_JS_BulkCC/ER5
+for file in *HF5*_tagged.bam; do
+	python ../../TagBam.py \
+	   --tag XJ:Z:CGGAGCCT \
+	   "$file" \
+	   "$file"_tagged2.bam	
+done
+### bash annotate insert
+echo "bash annotate insert"
+#Purge then load modules
+module purge
+module load SAMtools/1.16.1-GCC-11.3.0
+module load BEDTools/2.30.0-GCC-11.2.0
+
+#Prepare python environment
+module load Miniconda3/23.5.2-0
+source activate CallingcardsPy2
+
+cd 202306_JS_BulkCC/ER5
+for file in *HF5*tagged2.bam; do
+	python ../../AnnotateInsertionSites.py \
+	    --transposase PB \
+	    -f \
+	    "$file" \
+	    /mnt/scratch/users/jps558/staging/hg38/hg38.2bit \
+	   "$file"_final.bam
+	done
+for mile in *HF5*mapped.bam_tagged.bam_tagged2.bam_final.bam; do
+        mv "$mile" "${mile%%mapped.bam_tagged.bam_tagged2.bam_final.bam}final.bam"
+cd ../
+done
+cd ../
+### bash index bam
+echo "bash index bam"
+module purge
+module load SAMtools/1.16.1-GCC-11.3.0
+
+cd 202306_JS_BulkCC/ER5
+for file in *HF5*final.bam; do
+	samtools index "$file"
+	done
+cd  ../
+
+### bash convert bam to CC
+echo "bash convert bam to CC"
+module purge
+module load SAMtools/1.16.1-GCC-11.3.0
+module load BEDTools/2.30.0-GCC-11.2.0
+
+module load Miniconda3/23.5.2-0
+source activate CallingcardsPy2
+
+cd 202306_JS_BulkCC/
+mkdir outputs
+mkdir outputs/ER
+mkdir outputs/WT
+cd ER5/
+for file in *HF5*final.bam; do
+	python ../../BamToCallingCard.py \
+	    -b XP XJ \
+	    -i "$file" \
+	    > "$file".qbed
+	done
+for mile in *HF5*final.bam.qbed; do
+	mv "$mile" "${mile%%final.bam.qbed}.qbed"
+done
+  for save in *HF5*.qbed; do
+    cp *.qbed ../outputs/ER
+    done
+  for store in *HF5*final.bam*; do
+    cp "$store" ../outputs/ER
+    done
+	cd  ../
+done
+
+
+#Cat ER
+cd outputs/ER
+cat ER*HF552DSX7_L2_1_.qbed | bedtools sort -i > ER_HyPB_HF552DSX7_L2_1.qbed
+cat ER*HFK3FDSX7_L2_1_.qbed | bedtools sort -i > ER_HyPB_HFK3FDSX7_L2_1.qbed
+cat ER*.qbed | bedtools sort -i > ER_HyPB_EKDL230008858.qbed
+samtools merge ER*final.bam ER_HyPB_EKDL230008858_final.bam

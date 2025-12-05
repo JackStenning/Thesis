@@ -1,0 +1,12 @@
+#!/bin/bash
+
+module load bio/cutadapt/3.4-GCCcore-10.3.0
+for file in Wild-type_PB_Rep_1.fastq; do
+	cutadapt \
+		-g ^NGGGTTAA \
+		--minimum-length 1 \
+		-e 0 \
+		--no-indels \
+		-o "$file"_withoutdiscard_trimBC.fastq \
+		"$file"
+done

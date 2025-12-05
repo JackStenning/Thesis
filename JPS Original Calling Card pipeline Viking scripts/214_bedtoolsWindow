@@ -1,0 +1,46 @@
+#!/bin/bash
+
+############ Script 214 - Use Bedtools window to re-create Wang 2011 fig ############
+
+
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+cd /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing
+
+###### SP1 binding sites distance not yet checked ######
+###### All ChIP files are derived from downloaded and processed FASTQ ######
+
+#Make output directory
+mkdir WindowOutputs
+
+#################### SP1-HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir WindowOutputs/SP1-HyPB_win_SP1ChIP
+mkdir WindowOutputs/SP1-HyPB_win_SP1ChIP/Mitra
+mkdir WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE
+bedtools window -c -a CC/SP1-Hy_PBase/HyPB/GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/SP1-HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a CC/SP1-Hy_PBase/HyPB/GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed -b ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > WindowOutputs/SP1-HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_SP1-HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### WT HyPB CCpeaks compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir WindowOutputs/HyPB_win_SP1ChIP
+mkdir WindowOutputs/HyPB_win_SP1ChIP/Mitra
+mkdir WindowOutputs/HyPB_win_SP1ChIP/ENCODE
+bedtools window -c -a CC/Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed -b ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/HyPB_win_SP1ChIP/Mitra/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a CC/Undirected_Hy_PBase/HyPB/GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed -b ChIP/SP1/FASTQ/MACS2/ENCODE_input/SP1_ChIP_ENCODE_controlinput_peaks.narrowPeak > WindowOutputs/HyPB_win_SP1ChIP/ENCODE/1kb_Windowoutput_HyPB_CCpeaks_p9_SP1_ChIP_fq_ENCODE.bed
+
+#################### Genomic TTAA compared to SP1 Chip narrowpeak - 1kbp
+#Mitra control
+mkdir WindowOutputs/TTAA_win_SP1ChIP
+mkdir WindowOutputs/TTAA_win_SP1ChIP/Mitra
+mkdir WindowOutputs/TTAA_win_SP1ChIP/ENCODE
+bedtools window -c -a /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed -b ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/TTAA_win_SP1ChIP/Mitra/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_Mitra.bed
+
+#ENCODE control
+bedtools window -c -a /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38_TTAA.bed -b ChIP/SP1/FASTQ/MACS2/Mitra_input/SP1_ChIP_Mitra_input_peaks.narrowPeak > WindowOutputs/TTAA_win_SP1ChIP/ENCODE/1kb_Windowoutput_GenomicTTAA__SP1_ChIP_fq_ENCODE.bed
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/

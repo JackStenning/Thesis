@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+#check that there are two files for each sample (44 samples here)
+ ls workingCCdata/202306_JS_BulkCC/fastqc_output/ | wc -l
+
+#Then run multiqc
+cd workingCCdata/202306_JS_BulkCC/fastqc_output/
+module purge
+module load vis/matplotlib/3.7.0-gfbf-2022b
+module load bio/MultiQC/1.13-intel-2021b
+multiqc .
+cd /mnt/lustre/groups/biol-hic-2020/jack

@@ -1,0 +1,2 @@
+#!/bin/bash
+grep -v '_' staging/hg38/hg38_TTAA.bed > staging/hg38/hg38_TTAA_canon.bed

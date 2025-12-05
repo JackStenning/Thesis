@@ -1,0 +1,30 @@
+#!/bin/bash
+
+cd 202306_JS_BulkCC
+for file1 in ER1/*combo.fq.gz; do
+	for file2 in ER2/*combo.fq.gz; do
+		for file3 in ER3/*combo.fq.gz; do
+			for file5 in ER5/*combo.fq.gz; do
+				for file6 in ER6/*combo.fq.gz; do
+					cat "$file1" "$file2" "$file3" "$file5" "$file6"> ERreps_EKDL230008858_bc_hunt.fq.gz
+					done
+				done
+			done
+		done
+	done
+
+for file7 in WT1/*combo.fq.gz; do
+	for file8 in WT2/*combo.fq.gz; do
+		for file9 in WT3/*combo.fq.gz; do
+			for file10 in WT4/*combo.fq.gz; do
+				for file11 in WT5/*combo.fq.gz; do
+					for file12 in WT6/*combo.fq.gz; do
+						cat "$file7" "$file8" "$file9" "$file10" "$file11" "$file12" > WTreps_EKDL230008858_bc_hunt.fq.gz
+						done
+					done
+				done
+			done
+		done
+	done
+
+cd /mnt/scratch/users/jps558/Stenning_Data_Analysis

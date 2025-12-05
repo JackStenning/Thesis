@@ -1,0 +1,11 @@
+#!/bin/bash
+
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/Comparative_ChipandCC_analysis/20230629/SP1window
+
+bedtools window -a GSM4471639_HCT-116_SP1-HyPBaseMoudgil.bed -b SP1_ChIP_peaks.narrowPeak  > SP1window_CCa_ChIPb.bed
+
+bedtools window -c -a GSM4471639_HCT-116_SP1-HyPBaseMoudgil.bed -b SP1_ChIP_peaks.narrowPeak  > SP1window_CCa_ChIPb_withcountappend.bed
+
+cd /mnt/lustre/groups/biol-hic-2020/jack

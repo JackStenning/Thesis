@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./kmer staging/hg38/hg38.fa TTAA > staging/hg38/hg38_TTAA.bed

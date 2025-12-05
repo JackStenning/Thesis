@@ -1,0 +1,15 @@
+#!/bin/bash
+cd ../OCM1A
+for file in *BAP1-HyPBase.ccf.tx*; do
+	cp $file ../OCM1A_WT_HyPB_+-SP1
+	done
+for dile in *BAP1-PBase.ccf.tx*; do
+	cp $dile ../OCM1A_WT_HyPB_+-SP1
+	done
+for mile in *OCM1A-HyPBase.ccf.tx*; do
+	cp $mile ../OCM1A_WT_HyPB_+-SP1
+	done
+for kile in *OCM1A-PBase.ccf.tx*; do
+	cp $kile ../OCM1A_WT_HyPB_+-SP1
+	done
+cd ../HCT-116_WT_HyPB_PB_+-SP1

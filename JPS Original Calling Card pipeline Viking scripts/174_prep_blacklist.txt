@@ -1,0 +1,6 @@
+#!/bin/bash
+
+##### 	IF USING THIS SCRIPT CITE THE FOLLOWING PAPER FOR BLACKLIST #######
+### https://www.nature.com/articles/s41598-019-45839-z ###
+
+gunzip ../../staging/hg38/Blacklist/*.gz

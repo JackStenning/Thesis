@@ -1,0 +1,55 @@
+#!/bin/bash
+
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+##Move files into new directories for processing 
+#Make CC directorie s- remove '#' to re-run
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_SP1
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_SP1/input
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_Hy_PB
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_Hy_PB/input
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_SP1/output
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_SP1/input/output
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_Hy_PB/output
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230818CC_distance_analysis/HCT116_Hy_PB/input/output
+
+#Make ChIP directories- remove '#' to re-run
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/input
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/input
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/output
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_SP1/input/output
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/output
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/input/output
+
+##cp files into appropriate directories
+#SP1-(Hy)PBase CC
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230816_HCT_PBase_ccf_peakcall
+cp GSM4471639_HCT-116_SP1-HyPBase_filtered_sorted.qbed ../20230818CC_distance_analysis/HCT116_SP1
+cp GSM4471639_HCT-116_SP1-HyPBase_filtered_fdr_bh_0.05_peaks.bed ../20230818CC_distance_analysis/HCT116_SP1
+cp GSM4471637_HCT-116_SP1-PBase_filtered_sorted.qbed ../20230818CC_distance_analysis/HCT116_SP1
+cp GSM4471637_HCT-116_SP1-PBase_fdr_bh_0.05_peaks.bed ../20230818CC_distance_analysis/HCT116_SP1
+
+#(Hy)PBase CC
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230816_HCT_PBase_ccf_peakcall
+cp GSM4471638_HCT-116_HyPBase_filtered_sorted.qbed ../20230818CC_distance_analysis/HCT116__Hy_PB
+cp GSM4471638_HCT-116_HyPBase_filtered_p30_peaks.bed ../20230818CC_distance_analysis/HCT116_Hy_PB
+cp GSM4471636_HCT-116_PBase_filtered_sorted.qbed ../20230818CC_distance_analysis/HCT116_Hy_PB
+cp GSM4471636_HCT-116_PBase_filtered_p30_peaks.bed ../20230818CC_distance_analysis/HCT116_Hy_PB
+
+#SP1 ChIP
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230816_HCT_filtered/HCT116_SP1
+cp ENCFF000PCT_sorted_hg38.bam_filtered_sorted.bed ../../20230818CC_distance_analysis/HCT116_SP1
+cp ENCFF000PBY_sorted_hg38.bam_filtered_sorted.bed ../../20230818CC_distance_analysis/HCT116_SP1/input
+
+#BRD4 ChIP
+cd /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230816_HCT_filtered/HCT116_Brd4
+cp SRR2481799.fastq_sorted_hg38.bam_filtered_sorted.bed ../../20230818CC_distance_analysis/HCT116_BRD4
+###RUN BELOW WHEN BRD$ INPUT IS PROCESSED
+
+#cp SRR2481800.fastq_sorted_hg38.bam_filtered_sorted.bed ../../20230818CC_distance_analysis/HCT116_BRD4/input
+#examine peak files

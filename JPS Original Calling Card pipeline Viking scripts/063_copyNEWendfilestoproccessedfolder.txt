@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#Copies fastq, bw and bedgraph files from workingChipdata
+
+for dir in workingChipdata/HCT116_Brd4/*; do
+	cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_Brd4
+	cp *.bedgraph /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/pre230212/HCT116-Brd4/"$dir"
+	cp *.bw /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/pre230212/HCT116-Brd4/"$dir"
+	echo "Files from $dir were copied"
+	cd ../..
+	done

@@ -1,0 +1,7 @@
+#!/bin/bash
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/staging/hg18
+cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg18
+wget https://hgdownload.cse.ucsc.edu/goldenPath/hg18/bigZips/chromFa.zip
+unzip chromFa.zip
+cat chr*.fa > hg19.fa
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/Wang_2012

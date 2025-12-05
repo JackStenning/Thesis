@@ -1,0 +1,39 @@
+#/bin/bash
+
+####################### THE SUMMIT FILE WAS TAKEN OFF AS IT REDUCED THE AMOUNT OF OVERLAPPING READS FOUND #######################
+module purge
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#HyPB CCpeaks compared to BRD4 Chip narrowpeak - 1kbp - p = 9
+
+bedtools window -c -a GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 1kb_Windowoutput_HyPB_CCpeaks_p9_BRD4ChIPnp.bed
+
+#HyPB CCpeaks compared to BRD4 Chip narrowpeak - 1kbp - p = 62
+
+bedtools window -c -a GSM4471638_HCT-116_HyPBase_filtered_p62_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 1kb_Windowoutput_HyPB_CCpeaks_p62_BRD4ChIPnp.bed
+
+
+##PBase CCpeaks compared to Brd4 Chip narrowpeak - 1kbp - p = 9
+bedtools window -c -a GSM4471636_HCT-116_PBase_filtered_p9_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 1kb_Windowoutput_PBase_CCpeaks_p9_BRD4ChIPnp.bed
+
+##PBase CCpeaks compared to Brd4 Chip narrowpeak - 1kbp - p = 62
+bedtools window -c -a GSM4471636_HCT-116_PBase_filtered_p62_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 1kb_Windowoutput_PBase_CCpeaks_p62_BRD4ChIPnp.bed
+
+
+###################################### re-run with 250bp window
+
+#HyPB CCpeaks compared to BRD4 Chip narrowpeak - 250bp - p 9
+
+bedtools window -c -w 250 -a GSM4471638_HCT-116_HyPBase_filtered_p9_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 0.25kb_Windowoutput_HyPB_CCpeaks_p9_BRD4ChIPnp.bed
+
+#HyPB CCpeaks compared to BRD4 Chip narrowpeak - 250bp - p 62
+
+bedtools window -c -w 250 -a GSM4471638_HCT-116_HyPBase_filtered_p62_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 0.25kb_Windowoutput_HyPB_CCpeaks_p62_BRD4ChIPnp.bed
+
+
+##PBase CCpeaks compared to SP1 Chip narrowpeak - 250bp - p=9
+bedtools window -c -w 250 -a GSM4471636_HCT-116_PBase_filtered_p9_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 0.25kb_Windowoutput_PBase_CCpeaks_p9_BRD4ChIPnp.bed
+
+##PBase CCpeaks compared to SP1 Chip narrowpeak - 250bp - p=62
+bedtools window -c -w 250 -a GSM4471636_HCT-116_PBase_filtered_p62_peaks.bed -b /mnt/lustre/groups/biol-hic-2020/jack/processedChipdata/20230818CC_distance_analysis/HCT116_BRD4/MACS2/filtered_BRD4_ChIP_peaks.narrowPeak > 0.25kb_Windowoutput_PBase_CCpeaks_p62_BRD4ChIPnp.bed
+

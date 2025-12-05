@@ -1,0 +1,24 @@
+#!/bin/bash
+
+module load bio/cutadapt/3.4-GCCcore-10.3.0
+
+
+#First step is to cut off teh barcode and surrounding adapter
+#For WT calling cards in this experiment, the barcode is the same - CGT
+
+cd workingCCdata/
+for direct in 202306_JS_BulkCC/WT*; do
+cd "$direct"
+	for file in *1.fq; do
+		cutadapt \
+		    -g ^TAGTTTACGCAGACTATCTTTCTAGGGTTAA \
+		    --minimum-length 1 \
+		    --discard-untrimmed \
+		    -e 0 \
+		    --no-indels \
+	 	   -o "$file"TrimmedBC.fq \
+	 	   "$file"
+	done
+	cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/
+done
+cd /mnt/lustre/groups/biol-hic-2020/jack

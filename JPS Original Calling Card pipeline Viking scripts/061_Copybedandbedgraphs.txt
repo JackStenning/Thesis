@@ -1,0 +1,16 @@
+#!/bin/bash
+mkdir HCT_bedcopies
+for file in HCT-116/*.bed*; do
+	cp --target-directory=HCT_bedcopies $file
+	echo "Done Copying $file"
+	done
+for file in K562/*.ccf*; do
+	echo "Copying $file"
+	cp --target-directory=Copies/ $file
+	echo "Done Copying $file"
+	done
+echo "Done"
+
+echo "Done"
+
+

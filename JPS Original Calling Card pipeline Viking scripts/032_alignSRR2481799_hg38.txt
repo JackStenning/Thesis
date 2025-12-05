@@ -1,0 +1,8 @@
+#!/bin/bash
+#SBATCH --time=20:00:00 # Maximum time (24:00:00) 
+#SBATCH --nodes=1
+#SBATCH --mem=30gb
+
+
+
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/rawChipdata/HCT116_Brd4/hg38 SRR2481799.fastq > SRR2481799_aligned_hg.sam

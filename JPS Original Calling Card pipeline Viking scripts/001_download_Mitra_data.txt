@@ -1,0 +1,3 @@
+#!/bin/sh
+
+wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148448/suppl/GSE148448_RAW.tar

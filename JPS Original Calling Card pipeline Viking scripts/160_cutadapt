@@ -1,0 +1,13 @@
+#!/bin/bash
+
+module load bio/cutadapt/3.4-GCCcore-10.3.0
+for file in *.fastq; do
+	cutadapt \
+		-g ^NGGGTTAA \
+		--minimum-length 1 \
+		--discard-untrimmed \
+		-e 0 \
+		--no-indels \
+		-o "$file"_trimBC.fastq \
+		"$file"
+done

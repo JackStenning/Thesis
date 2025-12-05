@@ -1,0 +1,11 @@
+#!/bin/bash
+cd workingCCdata/202306_JS_BulkCC
+for dir in *; do
+	cd "$dir"
+	for mile in *.bai; do
+		cp "$mile" /mnt/lustre/groups/biol-hic-2020/jack/processedCCdata/20230712_ER_qBEDfiles/
+		cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/202306_JS_BulkCC
+	done
+
+done
+cd /mnt/lustre/groups/biol-hic-2020/jack

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+srun --ntasks=1 --time=08:30:00 --mem=50gb bwa index -p hg19 -a bwtsw hg19.fa

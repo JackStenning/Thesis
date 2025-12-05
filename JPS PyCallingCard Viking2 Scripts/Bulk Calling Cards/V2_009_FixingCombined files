@@ -1,0 +1,38 @@
+#!/bin/bash
+
+###TO FIX CONCANTENATED FILES, I'LL BE STARTING FROM CONVERTING INTO QBEDS
+
+cd 202306_JS_BulkCC/outputs/ER
+for file in *.qbed; do
+	mv "$file" "${file%%.fqTrimmedBC.fq_fulltrimmed.fastq.sam_.qbedfinal.qbed}.qbed"
+	done
+for dile in *final.bam.bai; do
+	mv "$dile" "${dile%%.fqTrimmedBC.fq_fulltrimmed.fastq.sam_final.bam.baifinal.bam.bai}_final.bam.bai"
+	done
+for mile in *final.bam; do
+	mv "$mile" "${mile%%.fqTrimmedBC.fq_fulltrimmed.fastq.sam_final.bamfinal.bam}_final.bam"
+	done
+
+
+module load SAMtools/1.16.1-GCC-11.3.0
+AND BED TOOLS
+
+
+#Cat ER
+mkdir combined/
+cat ER*HF552DSX7_L2_1_.qbed | bedtools sort -i > combined/ER_HyPB_HF552DSX7_L2_1.qbed
+cat ER*HFK3FDSX7_L2_1_.qbed | bedtools sort -i > combined/ER_HyPB_HFK3FDSX7_L2_1.qbed
+cat ER*.qbed | bedtools sort -i > combined/ER_HyPB_EKDL230008858.qbed
+samtools merge ER_HyPB_EKDL230008858_final.bam ER*final.bam
+cd combined/
+mv *qbed ../
+
+#Cat WT
+mkdir combined/
+cat WT*HF552DSX7_L2_1_.qbed | bedtools sort -i > combined/WT_HyPB_HF552DSX7_L2_1.qbed
+cat WT*HFK3FDSX7_L2_1_.qbed | bedtools sort -i > combined/WT_HyPB_HFK3FDSX7_L2_1.qbed
+cat WT*.qbed | bedtools sort -i > combined/WT_HyPB_EKDL230008858.qbed
+samtools merge WT_HyPB_EKDL230008858_final.bam WT*final.bam
+cd combined/
+mv *qbed ../
+cd ../../../../

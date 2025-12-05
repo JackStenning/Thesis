@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=Filter_all		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+##### NOTE CHECK WHICH GENOME SHOULD BE USED #######
+
+######## This script is only applicable for hg38 alignments ########
+
+for dir in workingCCdata/202306_JS_BulkCC/ER2; do
+    if [ -d "$dir" ]; then
+        cd "$dir"
+	for file in *fulltrimmed.fastq.sam; do
+		module purge
+		module load bio/SAMtools/1.9-foss-2018b
+	   	echo "$file"
+		samtools view \
+ 	  	 	-bS -h -F 260 \
+ 	  		 "$file" | \
+ 	   		samtools sort - -o "$file"_mapped.bam
+		done
+        cd /mnt/lustre/groups/biol-hic-2020/jack/
+    fi
+done

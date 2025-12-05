@@ -3,8 +3,7 @@
 #install.packages("Rtools")
 #install.packages("ggthemes")
 
-#DELTE AFTER WRITING
-############# SETUP ######################
+
 ############# SETUP ######################
 # Load packages
 library(ggplot2)

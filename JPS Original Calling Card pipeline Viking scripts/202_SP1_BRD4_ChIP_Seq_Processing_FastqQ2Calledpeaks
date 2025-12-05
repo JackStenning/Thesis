@@ -1,0 +1,335 @@
+#### This is a compiled list of how the SP1 and BRD4 ChIP-Seq was processed to analyse
+#### Moudgil 2020 data
+
+############ Script 203 - Download data ############
+
+#Set up working directories
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/
+mkdir HCT116_ChIP_Seq_processing
+cd HCT116_ChIP_Seq_processing
+mkdir SP1
+mkdir BRD4
+
+###Get files to these directories
+##SP1 Fastq, Bam and Input fastq and bam
+#FASTQ
+cd SP1
+mkdir FASTQ
+cd FASTQ
+curl  -L -o ENCFF000PCT.fastq.gz https://www.encodeproject.org/files/ENCFF000PCT/@@download/ENCFF000PCT.fastq.gz
+
+#BAM
+cd ../
+mkdir BAM
+cd BAM
+curl -L -o ENCFF190AVI.bam https://www.encodeproject.org/files/ENCFF190AVI/@@download/ENCFF190AVI.bam
+
+### Input controls
+#### NOTE - it appears the Mitra paper used the wrong input, the ENCODE data suggests that
+#### ENCFF000PBY is correct. However, the paper suggests they used ENCFF000PBO
+#### This is a different protocol number and appears to be run in a different way
+#### Download and process both and compare the difference between the two
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+mkdir input
+mkdir input/Mitra
+mkdir input/ENCODE
+
+#Download Mitra input
+cd input/Mitra
+curl -L -o ENCFF000PBO.fastq.gz https://www.encodeproject.org/files/ENCFF000PBO/@@download/ENCFF000PBO.fastq.gz
+mkdir BAM
+cd BAM
+curl -L -o ENCFF501FYY.bam https://www.encodeproject.org/files/ENCFF501FYY/@@download/ENCFF501FYY.bam
+
+#Download ENCODE input
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+curl -L -o ENCFF000PBY.fastq.gz https://www.encodeproject.org/files/ENCFF000PBY/@@download/ENCFF000PBY.fastq.gz
+
+##BRD4 Fastq, bw and Input fastq and bw
+#FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4
+mkdir FASTQ
+cd FASTQ
+curl -L -o SRR2481799.fastq.gz https://www.be-md.ncbi.nlm.nih.gov/Traces/sra-reads-be/fastq?acc=SRR2481799&clipped=1
+
+#BW - for both  SRR2481799 and SRR2481800 - downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE73319
+# Selected only the runs I wanted and manually transferred for ease
+
+#input 
+mkdir input
+cd input
+curl -L -o SRR2481800.fastq.gz https://www.be-md.ncbi.nlm.nih.gov/Traces/sra-reads-be/fastq?acc=SRR2481800&clipped=1
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+
+############ Script 204 - ChIP FASTQ to Bam ############
+#Loading modules
+module purge
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+
+#Process SP1 FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+gunzip *.gz
+bwa mem -p ENCFF000PCT -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PCT.fastq > ENCFF000PCT_aligned.sam
+samtools view -S -b ENCFF000PCT_aligned.sam > ENCFF000PCT.bam
+samtools sort ENCFF000PCT.bam -o ENCFF000PCT_sorted_hg38.bam
+samtools index ENCFF000PCT_sorted_hg38.bam
+
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+samtools sort ENCFF190AVI.bam -o ENCFF190AVI_sorted_hg38.bam
+samtools index ENCFF190AVI_sorted_hg38.bam
+
+#Process SP1 FASTQ inputs
+#Mitra FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra
+gunzip *.gz
+bwa mem -p ENCFF000PBO -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PBO.fastq > ENCFF000PBO_aligned.sam
+samtools view -S -b ENCFF000PBO_aligned.sam > ENCFF000PBO.bam
+samtools sort ENCFF000PBO.bam -o ENCFF000PBO_sorted_hg38.bam
+samtools index ENCFF000PBO_sorted_hg38.bam
+
+#Mitra BAM
+cd BAM
+samtools sort ENCFF501FYY.bam -o ENCFF501FYY_sorted_hg38.bam
+samtools index ENCFF501FYY_sorted_hg38.bam
+
+#Encode
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+gunzip *.gz
+bwa mem -p ENCFF000PBY -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PBY.fastq > ENCFF000PBY_aligned.sam
+samtools view -S -b ENCFF000PBY_aligned.sam > ENCFF000PBY.bam
+samtools sort ENCFF000PBY.bam -o ENCFF000PBY_sorted_hg38.bam
+samtools index ENCFF000PBY_sorted_hg38.bam
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+gunzip *.gz
+bwa mem -p SRR2481799 -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa SRR2481799.fastq > SRR2481799_aligned.sam
+samtools view -S -b SRR2481799_aligned.sam > SRR2481799.bam
+samtools sort SRR2481799.bam -o SRR2481799_sorted_hg38.bam
+samtools index SRR2481799_sorted_hg38.bam
+
+#input
+cd input
+gunzip *.gz
+bwa mem -p SRR2481800 -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa SRR2481800.fastq > SRR2481800_aligned.sam
+samtools view -S -b SRR2481800_aligned.sam > SRR2481800.bam
+samtools sort SRR2481800.bam -o SRR2481800_sorted_hg38.bam
+samtools index SRR2481800_sorted_hg38.bam
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+
+############ Script 205 - re-running Bam processing that failed in 204 O/N (Same code used as above) ############
+
+#Loading modules
+module purge
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+samtools sort ENCFF190AVI.bam -o ENCFF190AVI_sorted_hg38.bam
+samtools index ENCFF190AVI_sorted_hg38.bam
+
+
+#Mitra BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra/BAM
+samtools sort ENCFF501FYY.bam -o ENCFF501FYY_sorted_hg38.bam
+samtools index ENCFF501FYY_sorted_hg38.bam
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+############ Script 206 - filter blacklisted sites ############
+
+##### 	IF USING THIS SCRIPT CITE THE FOLLOWING PAPER FOR BLACKLIST #######
+### https://www.nature.com/articles/s41598-019-45839-z ###
+
+#Use this to get the blacklist, it has been # here becasue it was already done
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist
+#cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist
+# File was manually downloaded from https://github.com/Boyle-Lab/Blacklist/blob/master/lists/hg38-blacklist.v2.bed.gz and uploaded to the HPC
+#gunzip *.gz
+
+
+#Loading modules
+module purge
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#Process SP1 FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+bedtools bamtobed -i ENCFF000PCT_sorted_hg38.bam > ENCFF000PCT_hg38.bed
+bedtools sort -i ENCFF000PCT_hg38.bed > ENCFF000PCT_sorted_hg38.bed
+bedops -n -1 ENCFF000PCT_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF000PCT_filtered_sorted_hg38.bed
+
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+bedtools bamtobed -i ENCFF190AVI_sorted_hg38.bam > ENCFF190AVI_hg38.bed
+bedtools sort -i ENCFF190AVI_hg38.bed > ENCFF190AVI_sorted_hg38.bed
+bedops -n -1 ENCFF190AVI_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF190AVI_filtered_sorted_hg38.bed
+
+#Process SP1 FASTQ inputs
+#Mitra FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra
+bedtools bamtobed -i ENCFF000PBO_sorted_hg38.bam > ENCFF000PBO_hg38.bed
+bedtools sort -i ENCFF000PBO_hg38.bed > ENCFF000PBO_sorted_hg38.bed
+bedops -n -1 ENCFF000PBO_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF000PBO_filtered_sorted_hg38.bed
+
+#Mitra BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra/BAM
+bedtools bamtobed -i ENCFF501FYY_sorted_hg38.bam > ENCFF501FYY_hg38.bed
+bedtools sort -i ENCFF501FYY_hg38.bed > ENCFF501FYY_sorted_hg38.bed
+bedops -n -1 ENCFF501FYY_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF501FYY_filtered_sorted_hg38.bed
+
+#Encode
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+bedtools bamtobed -i ENCFF000PBY_sorted_hg38.bam > ENCFF000PBY_hg38.bed
+bedtools sort -i ENCFF000PBY_hg38.bed > ENCFF000PBY_sorted_hg38.bed
+bedops -n -1 ENCFF000PBY_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF000PBY_filtered_sorted_hg38.bed
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+bedtools bamtobed -i SRR2481799_sorted_hg38.bam > SRR2481799.bed
+bedtools sort -i SRR2481799_hg38.bed > SRR2481799_sorted_hg38.bed
+bedops -n -1 SRR2481799_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > SRR2481799_filtered_sorted_hg38.bed
+
+#input
+cd input
+bedtools bamtobed -i SRR2481800_sorted_hg38.bam > SRR2481800.bed
+bedtools sort -i SRR2481800_hg38.bed > SRR2481800_sorted_hg38.bed
+bedops -n -1 SRR2481800_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > SRR2481800_filtered_sorted_hg38.bed
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+
+############ Script 207 - Run MACS2 ############
+## NOTE - BRD4 and SP1 ChIP was processed with different parameters 
+
+#Loading modules
+module purge
+module load bio/MACS2/2.2.7.1-foss-2019b-Python-3.7.4
+
+#Process SP1 FASTQ with Mitra control
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+mkdir MACS2
+mkdir MACS2/Mitra_input
+mkdir MACS2/ENCODE_input
+macs2 callpeak -t ENCFF000PCT_filtered_sorted_hg38.bed \
+	-c input/Mitra/ENCFF000PBO_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	--keep-dup auto \
+	-q 0.05 \
+	-n SP1_ChIP_Mitra_input \
+	--outdir MACS2/Mitra_input
+
+#Process SP1 FASTQ with ENCODE control
+macs2 callpeak -t ENCFF000PCT_filtered_sorted_hg38.bed \
+	-c input/ENCODE/ENCFF000PBY_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	--keep-dup auto \
+	-q 0.05 \
+	-n SP1_ChIP_ENCODE_controlinput \
+	--outdir MACS2/ENCODE_input
+
+
+#FILES DOWNLOADED AS BAM FILES HAVE NOT BEEN PROCESSED, ONLY PROCESS IF THERE IS AN ISSUE WITH THESE FILES
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+mkdir MACS2
+macs2 callpeak -t SRR2481799_filtered_sorted_hg38.bed \
+	-c input/SRR2481800_filtered_sorted_hg38.bed \
+	-f BED \
+	-g hs \
+	-p 1e-9 \
+	-s 50 \
+	--keep-dup auto \
+	-n SP1_ChIP_ENCODE_controlinput \
+	--outdir MACS2
+
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+
+
+############ Script 208 - Put into output folder ############
+#Make processed data folder
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/BAM
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra/BAM
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/ENCODE
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ/input
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+
+#Process SP1 FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+cp -R --copy-contents /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2 /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/BAM
+
+
+#Process SP1 FASTQ inputs
+#Mitra FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra
+
+#Mitra BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra/BAM
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra/BAM
+
+#Encode
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/ENCODE
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+cp -R --copy-contents /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ/MACS2 /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+
+#input
+cd input
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ/input
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+
+
+
+END OF CHIP-SEQ PROCESSING, GOTO SCRIPT 209 for CC processing
+
+############ Script 209 - Processing_Moudgil_CC ############

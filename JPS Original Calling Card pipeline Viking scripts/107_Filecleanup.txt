@@ -1,0 +1,36 @@
+#!/bin/bash
+#SBATCH --job-name=BamtoCC		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=100gb                      # Job memory request
+#SBATCH --time=12:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+
+#Make sure python environment is active before starting this script.
+
+for dir in workingCCdata/202306_JS_BulkCC/*; do
+    if [ -d "$dir" ]; then
+        cd "$dir"
+        for file in *.sam.bedgraph; do
+            mv "$file" "${file%%.sam.bedgraph}.bedgraph"
+        done
+        for bam in *.sam.bam; do
+            mv "$bam" "${bam%%.sam.bam}.bam"
+        done
+        for sorted in *.sam_sorted.bedgraph; do
+            mv "$sorted" "${sorted%%.sam_sorted.bedgraph}_sorted.bedgraph"
+        done
+        for sbam in *.sam_sorted_hg38.bam; do
+            mv "$sbam" "${sbam%%.sam_sorted_hg38.bam}_sorted_hg38.bam"
+        done
+ 	for index in *.sam_sorted_hg38.bam.bai; do
+            mv "$index" "${index%%.sam_sorted_hg38.bam.bai}_sorted_hg38.bam.bai"
+        done
+        for bw in *.sam.bw; do
+            mv "$bw" "${bw%%.sam.bw}.bw"
+        done
+        cd /mnt/lustre/groups/biol-hic-2020/jack/
+    fi
+done

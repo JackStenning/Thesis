@@ -1,0 +1,27 @@
+#!/bin/bash
+
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+module load bio/BEDOPS/2.4.37-foss-2018b
+
+
+
+#Removing blacklist sites
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata
+for dir in HCT116*; do
+	cd "$dir"
+	echo 'starting "$dir"'
+	for file in *_sorted_hg38.bam; do
+		module purge
+		module load bio/BEDTools/2.30.0-GCC-11.2.0
+		bedtools bamtobed -i "$file" > "$file".bed
+		bedtools sort -i "$file".bed > "$file"_sorted.bed
+		module purge
+		module load bio/BEDOPS/2.4.37-foss-2018b
+		bedops -n -1 "$file"_sorted.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > "$file"_filtered_sorted.bed
+ 		cp "$file"_filtered_sorted.bed ../../../processedChipdata/20230816_HCT_filtered/
+		cp "$file".bed ../../../processedChipdata/20230816_HCT_filtered/
+		done
+	echo 'finished "$dir"'
+	done
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT-116_WT_HyPB_PB_+-SP1

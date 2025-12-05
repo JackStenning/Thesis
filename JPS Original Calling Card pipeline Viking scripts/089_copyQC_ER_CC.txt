@@ -1,0 +1,8 @@
+#!/bin/bash
+
+module load tools/binutils/2.30-GCCcore-7.3.
+
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/202306_JS_BulkCC/fastqc_output
+
+cp workingCCdata/202306_JS_BulkCC/*/*_fastqc* workingCCdata/202306_JS_BulkCC/fastqc_output
+

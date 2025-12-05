@@ -1,0 +1,63 @@
+#!/bin/bash
+
+##### 	IF USING THIS SCRIPT CITE THE FOLLOWING PAPER FOR BLACKLIST #######
+### https://www.nature.com/articles/s41598-019-45839-z ###
+
+#Use this to get the blacklist, it has been # here becasue it was already done
+#mkdir /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist
+#cd /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist
+# File was manually downloaded from https://github.com/Boyle-Lab/Blacklist/blob/master/lists/hg38-blacklist.v2.bed.gz and uploaded to the HPC
+#gunzip *.gz
+
+
+#Loading modules
+module purge
+module load bio/BEDOPS/2.4.37-foss-2018b
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+#Process SP1 FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+bedtools bamtobed -i ENCFF000PCT_sorted_hg38.bam > ENCFF000PCT_hg38.bed
+bedtools sort -i ENCFF000PCT_hg38.bed > ENCFF000PCT_sorted_hg38.bed
+bedops -n -1 ENCFF000PCT_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF000PCT_filtered_sorted_hg38.bed
+
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+bedtools bamtobed -i ENCFF190AVI_sorted_hg38.bam > ENCFF190AVI_hg38.bed
+bedtools sort -i ENCFF190AVI_hg38.bed > ENCFF190AVI_sorted_hg38.bed
+bedops -n -1 ENCFF190AVI_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF190AVI_filtered_sorted_hg38.bed
+
+#Process SP1 FASTQ inputs
+#Mitra FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra
+bedtools bamtobed -i ENCFF000PBO_sorted_hg38.bam > ENCFF000PBO_hg38.bed
+bedtools sort -i ENCFF000PBO_hg38.bed > ENCFF000PBO_sorted_hg38.bed
+bedops -n -1 ENCFF000PBO_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF000PBO_filtered_sorted_hg38.bed
+
+#Mitra BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra/BAM
+bedtools bamtobed -i ENCFF501FYY_sorted_hg38.bam > ENCFF501FYY_hg38.bed
+bedtools sort -i ENCFF501FYY_hg38.bed > ENCFF501FYY_sorted_hg38.bed
+bedops -n -1 ENCFF501FYY_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF501FYY_filtered_sorted_hg38.bed
+
+#Encode
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+bedtools bamtobed -i ENCFF000PBY_sorted_hg38.bam > ENCFF000PBY_hg38.bed
+bedtools sort -i ENCFF000PBY_hg38.bed > ENCFF000PBY_sorted_hg38.bed
+bedops -n -1 ENCFF000PBY_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > ENCFF000PBY_filtered_sorted_hg38.bed
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+bedtools bamtobed -i SRR2481799_sorted_hg38.bam > SRR2481799.bed
+bedtools sort -i SRR2481799_hg38.bed > SRR2481799_sorted_hg38.bed
+bedops -n -1 SRR2481799_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > SRR2481799_filtered_sorted_hg38.bed
+
+#input
+cd input
+bedtools bamtobed -i SRR2481800_sorted_hg38.bam > SRR2481800.bed
+bedtools sort -i SRR2481800_hg38.bed > SRR2481800_sorted_hg38.bed
+bedops -n -1 SRR2481800_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/Blacklist/hg38-blacklist.v2.bed > SRR2481800_filtered_sorted_hg38.bed
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+

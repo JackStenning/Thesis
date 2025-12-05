@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name=WT_PB_1		 # Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=30gb                      # Job memory request
+#SBATCH --time=03:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+module purge
+module load bio/Bowtie/1.3.1-GCC-11.3.0
+bowtie -q --best --tryhard --minins 0 --maxins 1200 --interleaved Wild-type_PB_Rep_1.fastq_trimBC.fastq bowtie_index > Wild-type_PB_Rep_1.sam

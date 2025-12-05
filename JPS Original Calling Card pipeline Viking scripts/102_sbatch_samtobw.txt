@@ -1,0 +1,12 @@
+#!/bin/bash
+sbatch 091_ER_CC_samtobigwig_hg38.txt 
+sbatch 092_ER2_CC_samtobigwig_hg38.txt 
+sbatch 093_ER3_CC_samtobigwig_hg38.txt 
+sbatch 094_ER5_CC_samtobigwig_hg38.txt 
+sbatch 095_ER6_CC_samtobigwig_hg38.txt 
+sbatch 096_ER-WT_CC_samtobigwig_hg38.txt 
+sbatch 097_ER-WT2_CC_samtobigwig_hg38.txt 
+sbatch 098_ER-WT3_CC_samtobigwig_hg38.txt 
+sbatch 099_ER-WT4_CC_samtobigwig_hg38.txt 
+sbatch 100_ER-WT5_CC_samtobigwig_hg38.txt 
+sbatch 101_ER-WT6_CC_samtobigwig_hg38.txt 

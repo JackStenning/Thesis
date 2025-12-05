@@ -1,0 +1,10 @@
+  684  rm -r hg38
+  685  ls
+  686  wget --timestamping
+  687  wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz' -O hg38.fa.gz
+  688  ls
+  689  cp hg38.fa.gz hg38_copy.fa.gz
+  690  gunzip hg38.fa.gz 
+  691  ls
+  692  history | tail -n 10
+  693  history | tail -n 10 > 021_downloadhg38

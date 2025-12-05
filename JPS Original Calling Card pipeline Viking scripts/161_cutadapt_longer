@@ -1,0 +1,21 @@
+#!/bin/bash
+
+module load bio/cutadapt/3.4-GCCcore-10.3.0
+
+cutadapt \
+	-g TTTACGCAGACTATCTTTCTAGGGTTAA \
+	--minimum-length 1 \
+	--discard-untrimmed \
+	-e 0 \
+	--no-indels \
+	-o Wild-type_PB_Rep_3.fastq_trimBC.fastq \
+	Wild-type_PB_Rep_3.fastq
+
+cutadapt \
+	-g TTTACGCAGACTATCTTTCTAGGGTTAA \
+	--minimum-length 1 \
+	--discard-untrimmed \
+	-e 0 \
+	--no-indels \
+	-o SP1_PB_Rep_2.fastq_trimBC.fastq \
+	SP1_PB_Rep_2.fastq

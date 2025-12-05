@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for file in */*.ccf*; do
+	echo "Copying $file"
+	cp --target-directory=Copies/ $file
+	echo "Done Copying $file"
+	done
+echo "Done"

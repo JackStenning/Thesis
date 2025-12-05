@@ -1,0 +1,50 @@
+#!/bin/bash
+#SBATCH --job-name=Copyendfiles 	# Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=5gb                       # Job memory request
+#SBATCH --time=02:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+
+############ Script 213 - Put into output folder ############
+
+#Make processed data folder
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB/Moudgil_peaks
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/Moudgil_peaks
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB/Moudgil_peaks
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/Moudgil_peaks
+
+
+#SP1-HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/HyPB
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/HyPB/Moudgil_peaks
+
+#SP1-PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/SP1-Hy_PBase/PBase
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/SP1-Hy_PBase/PBase/Moudgil_peaks
+
+#HyPB
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/HyPB
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/HyPB/Moudgil_peaks
+
+#PBase
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/HCT116_CC_processing/Undirected_Hy_PBase/PBase
+cp *filtered* /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase
+cp *peaks.tsv /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/CC/Undirected_Hy_PBase/PBase/Moudgil_peaks
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/

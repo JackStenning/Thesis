@@ -1,0 +1,34 @@
+#!/bin/bash
+#SBATCH --job-name=align_ChIP2   	# Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=3                       # Run on a single CPU
+#SBATCH --mem=50gb                       # Job memory request
+#SBATCH --time=10:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+
+#Encode
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+gunzip *.gz
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PBY.fastq > ENCFF000PBY_aligned.sam
+samtools view -S -b ENCFF000PBY_aligned.sam > ENCFF000PBY.bam
+samtools sort ENCFF000PBY.bam -o ENCFF000PBY_sorted_hg38.bam
+samtools index ENCFF000PBY_sorted_hg38.bam
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+gunzip *.gz
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa SRR2481799.fastq > SRR2481799_aligned.sam
+samtools view -S -b SRR2481799_aligned.sam > SRR2481799.bam
+samtools sort SRR2481799.bam -o SRR2481799_sorted_hg38.bam
+samtools index SRR2481799_sorted_hg38.bam
+
+#input
+cd input
+gunzip *.gz
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa SRR2481800.fastq > SRR2481800_aligned.sam
+samtools view -S -b SRR2481800_aligned.sam > SRR2481800.bam
+samtools sort SRR2481800.bam -o SRR2481800_sorted_hg38.bam
+samtools index SRR2481800_sorted_hg38.bam

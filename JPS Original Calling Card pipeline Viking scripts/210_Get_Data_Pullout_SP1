@@ -1,0 +1,49 @@
+#!/bin/bash
+#SBATCH --job-name=DownloadCCdata  	# Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=1                       # Run on a single CPU
+#SBATCH --mem=18gb                       # Job memory request
+#SBATCH --time=06:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+
+############ Script 210 - Get data and pull out SP1 ############
+
+#Set up directories
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingCCdata/
+mkdir HCT116_CC_processing
+cd HCT116_CC_processing
+mkdir SP1-Hy_PBase
+mkdir SP1-Hy_PBase/HyPB
+mkdir SP1-Hy_PBase/PBase
+mkdir Undirected_Hy_PBase
+mkdir Undirected_Hy_PBase/HyPB
+mkdir Undirected_Hy_PBase/PBase
+
+
+#Get data
+curl -L -o GSE148448_RAW.tar ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148448/suppl/GSE148448_RAW.tar
+mkdir RAW
+mv GSE148448_RAW.tar RAW
+
+#Untar data
+cd RAW
+tar -xvf GSE148448_RAW.tar
+
+##Move data to the correct place
+#Undirected PBase
+mv *HCT-116_PBase* ../Undirected_Hy_PBase/PBase
+
+#Undirected HyPB
+mv *HCT-116_HyPBase* ../Undirected_Hy_PBase/HyPB
+
+#SP1-PBase
+mv *HCT-116_SP1-PBase* ../SP1-Hy_PBase/PBase
+
+#SP1-HyPB
+mv *HCT-116_SP1-HyPBase* ../SP1-Hy_PBase/HyPB
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/

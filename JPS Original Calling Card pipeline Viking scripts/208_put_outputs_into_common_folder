@@ -1,0 +1,53 @@
+#!/bin/bash
+
+############ Script 208 - Put into output folder ############
+#Make processed data folder
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/BAM
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra/BAM
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/ENCODE
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ/input
+mkdir /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+
+#Process SP1 FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+cp -R --copy-contents /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/MACS2 /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/BAM
+
+
+#Process SP1 FASTQ inputs
+#Mitra FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra
+
+#Mitra BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra/BAM
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/Mitra/BAM
+
+#Encode
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/ENCODE
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/SP1/FASTQ/input/ENCODE
+
+#Process BRD4
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/BRD4/FASTQ
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+cp -R --copy-contents /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ/MACS2 /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ
+
+#input
+cd input
+cp *_filtered_sorted_hg38.bed /mnt/lustre/groups/biol-hic-2020/jack/20230908HCT116_ChIP_Seq_processing/ChIP/BRD4/FASTQ/input
+
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
+

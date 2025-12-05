@@ -1,0 +1,6 @@
+#!/bin/bash
+
+module load bio/BEDTools/2.30.0-GCC-11.2.0
+
+cd /mnt/lustre/groups/biol-hic-2020/jack/Comparative_ChipandCC_analysis/20230626/SP1_intersect
+bedtools intersect -c -a SP1_ChIP_peaks.narrowPeak -b GSM4471639_HCT-116_SP1-HyPBaseMoudgil.bed > SP1intersect_ChIPa_CCb_withcount.bed

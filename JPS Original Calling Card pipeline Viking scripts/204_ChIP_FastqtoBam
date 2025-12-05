@@ -1,0 +1,47 @@
+#!/bin/bash
+#SBATCH --job-name=align_ChIP1   	# Job name
+#SBATCH --mail-type=END,FAIL             # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=jps558@york.ac.uk    # Where to send mail  
+#SBATCH --ntasks=3                       # Run on a single CPU
+#SBATCH --mem=50gb                       # Job memory request
+#SBATCH --time=10:00:00                  # Time limit hrs:min:sec
+#SBATCH --output=basic_job_%j.log        # Standard output and error log
+#SBATCH --account=biol-hic-2020          # Project account
+#SBATCH --partition=preempt
+
+############ Script 204 - ChIP FASTQ to Bam ############
+#Loading modules
+module purge
+module load bio/BWA/0.7.17-foss-2019b
+module load bio/SAMtools/1.9-foss-2018b
+
+#Process SP1 FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ
+gunzip *.gz
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PCT.fastq > ENCFF000PCT_aligned.sam
+samtools view -S -b ENCFF000PCT_aligned.sam > ENCFF000PCT.bam
+samtools sort ENCFF000PCT.bam -o ENCFF000PCT_sorted_hg38.bam
+samtools index ENCFF000PCT_sorted_hg38.bam
+
+#Process SP1 BAM
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/BAM
+samtools sort ENCFF190AVI.bam -o ENCFF190AVI_sorted_hg38.bam
+samtools index ENCFF190AVI_sorted_hg38.bam
+
+#Process SP1 FASTQ inputs
+#Mitra FASTQ
+cd /mnt/lustre/groups/biol-hic-2020/jack/workingChipdata/HCT116_ChIP_Seq_processing/SP1/FASTQ/input/Mitra
+gunzip *.gz
+bwa mem -p -t 40 /mnt/lustre/groups/biol-hic-2020/jack/staging/hg38/hg38.fa ENCFF000PBO.fastq > ENCFF000PBO_aligned.sam
+samtools view -S -b ENCFF000PBO_aligned.sam > ENCFF000PBO.bam
+samtools sort ENCFF000PBO.bam -o ENCFF000PBO_sorted_hg38.bam
+samtools index ENCFF000PBO_sorted_hg38.bam
+
+#Mitra BAM
+cd BAM
+samtools sort ENCFF501FYY.bam -o ENCFF501FYY_sorted_hg38.bam
+samtools index ENCFF501FYY_sorted_hg38.bam
+
+###### CODE WAS SPLIT HERE_ look at 204_2 for rest or 202 for complete
+#Go back to /jack
+cd /mnt/lustre/groups/biol-hic-2020/jack/
